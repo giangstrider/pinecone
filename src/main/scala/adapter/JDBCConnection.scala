@@ -8,13 +8,6 @@ import configuration.Pinecone.pineconeConf
 
 
 class JDBCConnection(val config: Map[String, String]) {
-	private val supportedDriver = Map(
-		"sqlserver" -> "com.microsoft.sqlserver.jdbc.SQLServerDriver",
-        "db2" -> "com.ibm.db2.jcc.DB2Driver",
-        "redshift" -> "com.amazon.redshift.jdbc.Driver",
-        "postgresql" -> "org.postgresql.Driver",
-        "snowflake" -> "net.snowflake.client.jdbc.SnowflakeDriver"
-	)
 	private val getDriver: String = {
 		val databaseName = config("jdbcUrl").split(":")(1)
 		pineconeConf.databaseSupportedDriver.getOrElse(databaseName,
