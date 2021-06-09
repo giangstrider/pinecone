@@ -15,6 +15,9 @@ lazy val root = project
             "net.snowflake" % "snowflake-jdbc" % "3.13.4",
             "com.microsoft.sqlserver" % "mssql-jdbc" % "7.0.0.jre8",
             "com.amazon.redshift" % "redshift-jdbc42" % "2.0.0.4",
-            "com.ibm.db2.jcc" % "db2jcc" % "db2jcc4"
+            "com.ibm.db2.jcc" % "db2jcc" % "db2jcc4",
+             "org.scalactic" %% "scalactic" % "3.2.9",
+            "org.scalatest" %% "scalatest" % "3.2.9" % "test",
+            "org.scalatest" %% "scalatest-flatspec" % "3.2.9" % "test"
         )
     )
