@@ -8,7 +8,8 @@ import pureconfig.generic.auto._
 case class PineconeConf(
     database: PineconeDatabaseConf,
     proxy: PineconeProxyConf,
-    databaseSupportedDriver: Map[String, String]
+    databaseSupportedDriver: Map[String, String],
+    sqlTemplate: PineconeSQLTemplateConf
 )
 
 case class PineconeDatabaseConf(
@@ -23,6 +24,12 @@ case class PineconeProxyConf(
 	httpPort: Option[String],
 	httpsProxy: Option[String],
 	httpsPort: Option[String]
+)
+
+case class PineconeSQLTemplateConf(
+    timeZone: String,
+    dateFormat: String,
+    timestampFormat: String
 )
 
 case class ConnectionConf(
