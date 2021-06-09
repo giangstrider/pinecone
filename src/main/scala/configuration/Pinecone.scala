@@ -5,38 +5,6 @@ import pureconfig.error.ConfigReaderFailure
 import pureconfig.generic.auto._
 
 
-case class PineconeConf(
-    database: PineconeDatabaseConf,
-    proxy: PineconeProxyConf,
-    databaseSupportedDriver: Map[String, String],
-    sqlTemplate: PineconeSQLTemplateConf
-)
-
-case class PineconeDatabaseConf(
-    connectionName: String,
-    schemaName: String,
-    databaseName: String
-)
-
-case class PineconeProxyConf(
-    useProxy: Boolean,
-    httpProxy: Option[String],
-	httpPort: Option[String],
-	httpsProxy: Option[String],
-	httpsPort: Option[String]
-)
-
-case class PineconeSQLTemplateConf(
-    timeZone: String,
-    dateFormat: String,
-    timestampFormat: String
-)
-
-case class ConnectionConf(
-	jdbc: Map[String, Map[String, String]]
-)
-
-
 object Pinecone {
 	def pineconeConf(): PineconeConf = {
 		ConfigSource.resources("pinecone.conf").load[PineconeConf] match {
@@ -47,6 +15,12 @@ object Pinecone {
 	def connectionConf(): Map[String, Map[String, String]] = {
 		ConfigSource.resources("connection.conf").load[ConnectionConf] match {
 			case Right(conf) => conf.jdbc
+		}
+	}
+
+	def queriesConf(): Queries = {
+		ConfigSource.resources("queries.conf").load[Queries] match {
+			case Right(conf) => conf
 		}
 	}
 }
