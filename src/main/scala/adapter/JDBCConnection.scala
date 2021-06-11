@@ -46,6 +46,16 @@ class JDBCConnection(val config: Map[String, String]) {
 		val placeholders = dataParams.map(row => s"(${row.map(n => s"{${n.name}}").mkString(",")})").mkString(",")
 
 		val placeholderQuery = s"INSERT INTO $tableName($columns) VALUES $placeholders"
-		SQL(placeholderQuery).on(dataParams.flatten: _*).executeUpdate()
+	def executeUpdateById[R](tableName: String, macroParam: ToParameterList[R], data: List[R], compositeKey: Set[String])	= {
+		implicit val connection: Connection = initConnection
+		val dataParams = data.map(macroParam).map(row => row.map(r => NamedParameter(SnakeCase(r.name), r.value)))
+
+		val columns = dataParams.head.map(_.name)
+		val updatingColumns = columns.filterNot(compositeKey).map(column => s"$column = {$column}").mkString(", ")
+		val compositeKeyColumns = compositeKey.map(column => s"$column = {$column}").mkString(" AND ")
+
+		val placeholderQuery = s"UPDATE $tableName SET $updatingColumns WHERE $compositeKeyColumns"
+		val splitDataParams = dataParams.splitAt(1)
+		BatchSql(placeholderQuery, splitDataParams._1.head, splitDataParams._2:_*).execute
 	}
 }
