@@ -1,9 +1,11 @@
 package adapter
 
+import anorm.Macro.ColumnNaming.SnakeCase
+
 import java.sql.Connection
 import java.util.Properties
 import com.zaxxer.hikari.{HikariConfig, HikariDataSource}
-import anorm.{RowParser, SQL}
+import anorm.{BatchSql, Macro, NamedParameter, RowParser, SQL, SqlStringInterpolation, ToParameterList}
 import configuration.Pinecone.pineconeConf
 
 
@@ -32,5 +34,14 @@ class JDBCConnection(val config: Map[String, String]) {
 				sqlResult.as(parser.*)
 			case _ => sqlResult.as(parser.*)
 		}
+	}
+
+	def executeInsert[R](tableName: String, macroParam: ToParameterList[R], data: List[R]) = {
+		implicit val connection: Connection = initConnection
+		val dataParams = for {p <- data.flatMap(macroParam)} yield NamedParameter(SnakeCase(p.name), p.value)
+		val columns = dataParams.map(column => column.name)
+		val placeholders = columns.map {n => s"{$n}"} mkString ", "
+		val transformQuery = s"INSERT INTO $tableName(${columns mkString ", "}) VALUES ($placeholders)"
+		SQL(transformQuery).on(dataParams: _*).executeUpdate()
 	}
 }
