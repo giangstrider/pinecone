@@ -38,10 +38,14 @@ class JDBCConnection(val config: Map[String, String]) {
 
 	def executeInsert[R](tableName: String, macroParam: ToParameterList[R], data: List[R]) = {
 		implicit val connection: Connection = initConnection
-		val dataParams = for {p <- data.flatMap(macroParam)} yield NamedParameter(SnakeCase(p.name), p.value)
-		val columns = dataParams.map(column => column.name)
-		val placeholders = columns.map {n => s"{$n}"} mkString ", "
-		val transformQuery = s"INSERT INTO $tableName(${columns mkString ", "}) VALUES ($placeholders)"
-		SQL(transformQuery).on(dataParams: _*).executeUpdate()
+
+		val dataParams = data.map(macroParam).zipWithIndex.map{
+			case(row, i) => row.map(r => NamedParameter(s"${SnakeCase(r.name)}_$i", r.value))
+		}
+		val columns = dataParams.head.map(column => column.name.dropRight(2)).mkString(", ")
+		val placeholders = dataParams.map(row => s"(${row.map(n => s"{${n.name}}").mkString(",")})").mkString(",")
+
+		val placeholderQuery = s"INSERT INTO $tableName($columns) VALUES $placeholders"
+		SQL(placeholderQuery).on(dataParams.flatten: _*).executeUpdate()
 	}
 }
