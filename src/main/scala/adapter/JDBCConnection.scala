@@ -42,7 +42,7 @@ class JDBCConnection(val config: Map[String, String]) {
 		val dataParams = data.map(macroParam).zipWithIndex.map{
 			case(row, i) => row.map(r => NamedParameter(s"${SnakeCase(r.name)}_$i", r.value))
 		}
-		val columns = dataParams.head.map(column => column.name.dropRight(2)).mkString(", ")
+		val columns = dataParams.head.map(column => column.name.split("_").dropRight(1).mkString("_")).mkString(", ")
 		val placeholders = dataParams.map(row => s"(${row.map(n => s"{${n.name}}").mkString(",")})").mkString(",")
 
 		val placeholderQuery = s"INSERT INTO $tableName($columns) VALUES $placeholders"
