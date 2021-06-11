@@ -5,7 +5,7 @@ import anorm.Macro.ColumnNaming.SnakeCase
 import java.sql.Connection
 import java.util.Properties
 import com.zaxxer.hikari.{HikariConfig, HikariDataSource}
-import anorm.{BatchSql, Macro, NamedParameter, RowParser, SQL, SqlStringInterpolation, ToParameterList}
+import anorm.{BatchSql, NamedParameter, RowParser, SQL, ToParameterList}
 import configuration.Pinecone.pineconeConf
 
 
@@ -46,6 +46,9 @@ class JDBCConnection(val config: Map[String, String]) {
 		val placeholders = dataParams.map(row => s"(${row.map(n => s"{${n.name}}").mkString(",")})").mkString(",")
 
 		val placeholderQuery = s"INSERT INTO $tableName($columns) VALUES $placeholders"
+		SQL(placeholderQuery).on(dataParams.flatten: _*).executeUpdate
+	}
+
 	def executeUpdateById[R](tableName: String, macroParam: ToParameterList[R], data: List[R], compositeKey: Set[String])	= {
 		implicit val connection: Connection = initConnection
 		val dataParams = data.map(macroParam).map(row => row.map(r => NamedParameter(SnakeCase(r.name), r.value)))
