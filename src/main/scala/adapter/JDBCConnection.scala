@@ -58,7 +58,6 @@ class JDBCConnection(val config: Map[String, String]) {
 		val compositeKeyColumns = compositeKey.map(column => s"$column = {$column}").mkString(" AND ")
 
 		val placeholderQuery = s"UPDATE $tableName SET $updatingColumns WHERE $compositeKeyColumns"
-		val splitDataParams = dataParams.splitAt(1)
-		BatchSql(placeholderQuery, splitDataParams._1.head, splitDataParams._2:_*).execute
+		BatchSql(placeholderQuery, dataParams.head, dataParams.tail:_*).execute
 	}
 }
