@@ -6,17 +6,47 @@ import java.sql.Connection
 import java.util.Properties
 import com.zaxxer.hikari.{HikariConfig, HikariDataSource}
 import anorm.{BatchSql, NamedParameter, RowParser, SQL, ToParameterList}
-import configuration.Pinecone.pineconeConf
+import configuration.Pinecone.{pineconeConf, connectionConf}
 
+
+object JDBCConnection {
+	private var connectionDictionary: Map[String, JDBCConnection] = Map.empty
+
+	def getJdbcConnection(connectionName: String): JDBCConnection = {
+		connectionDictionary.get(connectionName) match {
+			case Some(jdbcConnection) => jdbcConnection
+			case None =>
+				val connectionJdbc = new JDBCConnection(getConnectionDetail(connectionName))
+				connectionDictionary += (connectionName -> connectionJdbc)
+				connectionJdbc
+		}
+	}
+
+	private def getConnectionDetail(connectionName: String): Map[String, String] = {
+		connectionConf.getOrElse(connectionName,
+			throw new Exception(s"Connection $connectionName not found in connection.conf file"))
+	}
+}
 
 class JDBCConnection(val config: Map[String, String]) {
 	private val getDriver: String = {
 		val databaseName = config("jdbcUrl").split(":")(1)
 		pineconeConf.databaseSupportedDriver.getOrElse(databaseName,
-			throw new Exception(s"Database ${databaseName} not supported by Pinecone yet"))
+			throw new Exception(s"Database $databaseName not supported by Pinecone yet"))
+	}
+	private var initializedConnection = None: Option[Connection]
+	
+	private implicit def getConnection: Connection = {
+		initializedConnection match {
+			case Some(connection) => connection
+			case None =>
+				val connection = initConnection
+				initializedConnection = Some(connection)
+				connection
+		}
 	}
 
-	def initConnection: Connection = {
+	private def initConnection: Connection = {
 		val properties = new Properties
 		config.map(c => properties.put(c._1, c._2))
 		properties.put("driverClassName", getDriver)
@@ -26,7 +56,6 @@ class JDBCConnection(val config: Map[String, String]) {
 	}
 
 	def executeQuery[R](query: String, parser: RowParser[R]): List[R] = {
-		implicit val connection: Connection = initConnection
 		val sqlResult = SQL(query).executeQuery
 		sqlResult.statementWarning match {
 			case Some(warning) =>
@@ -36,9 +65,7 @@ class JDBCConnection(val config: Map[String, String]) {
 		}
 	}
 
-	def executeInsert[R](tableName: String, macroParam: ToParameterList[R], data: List[R]) = {
-		implicit val connection: Connection = initConnection
-
+	def executeInsert[R](tableName: String, macroParam: ToParameterList[R], data: List[R])	= {
 		val dataParams = data.map(macroParam).zipWithIndex.map{
 			case(row, i) => row.map(r => NamedParameter(s"${SnakeCase(r.name)}_$i", r.value))
 		}
@@ -50,7 +77,6 @@ class JDBCConnection(val config: Map[String, String]) {
 	}
 
 	def executeUpdateById[R](tableName: String, macroParam: ToParameterList[R], data: List[R], compositeKey: Set[String])	= {
-		implicit val connection: Connection = initConnection
 		val dataParams = data.map(macroParam).map(row => row.map(r => NamedParameter(SnakeCase(r.name), r.value)))
 
 		val columns = dataParams.head.map(_.name)
