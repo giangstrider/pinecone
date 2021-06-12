@@ -1,0 +1,5 @@
+package exception
+
+class Pinecone {
+
+}
