@@ -12,40 +12,15 @@ import exception.PineconeExceptionHandler.exceptionStop
 import scala.util.{Failure, Success, Try}
 
 
-object JDBCConnection {
-	private var connectionDictionary: Map[String, JDBCConnection] = Map.empty
+abstract class GeneralConnection(val config: Map[String, String]) {
+	private implicit val connection: Connection = getConnection
 
-	def getJdbcConnection(connectionName: String): JDBCConnection = {
-		connectionDictionary.get(connectionName) match {
-			case Some(jdbcConnection) => jdbcConnection
-			case None =>
-				val connectionJdbc = new JDBCConnection(getConnectionDetail(connectionName))
-				connectionDictionary += (connectionName -> connectionJdbc)
-				connectionJdbc
-		}
-	}
+	protected def getDriver: String
 
-	private def getConnectionDetail(connectionName: String): Map[String, String] = {
-		connectionConf.getOrElse(connectionName,
-			throw new Exception(s"Connection $connectionName not found in connection.conf file"))
-	}
-}
-
-class JDBCConnection(val config: Map[String, String]) {
-	private val getDriver: String = {
-		val databaseName = config("jdbcUrl").split(":")(1)
-		pineconeConf.databaseSupportedDriver.getOrElse(databaseName,
-			throw new Exception(s"Database $databaseName not supported by Pinecone yet"))
-	}
-	private var initializedConnection = None: Option[Connection]
-
-	private implicit def getConnection: Connection = {
-		initializedConnection match {
-			case Some(connection) => connection
-			case None => initConnection match {
-					case Success(c) => initializedConnection = Some(c); c
-					case Failure(exception) => exceptionStop(exception)
-				}
+	private def getConnection: Connection = {
+		initConnection match {
+			case Success(c) => c
+			case Failure(exception) => exceptionStop(exception)
 		}
 	}
 
@@ -82,7 +57,6 @@ class JDBCConnection(val config: Map[String, String]) {
 		val placeholderQuery = s"INSERT INTO $tableName($columns) VALUES $placeholders"
 
 		Try(SQL(placeholderQuery).on(dataParams.flatten: _*).executeUpdate)
-
 	}
 
 	def executeUpdateById[R](tableName: String, macroParam: ToParameterList[R],
@@ -97,3 +71,28 @@ class JDBCConnection(val config: Map[String, String]) {
 		Try(BatchSql(placeholderQuery, dataParams.head, dataParams.tail:_*).execute)
 	}
 }
+
+object GeneralConnection {
+	private var connectionDictionary: Map[String, GeneralConnection] = Map.empty
+
+	def getJdbcConnection(connectionName: String): GeneralConnection = {
+		connectionDictionary.get(connectionName) match {
+			case Some(jdbcConnection) => jdbcConnection
+			case None =>
+				val connectionDetail = getConnectionDetail(connectionName)
+				val databaseName = connectionDetail("jdbcUrl").split(":")(1)
+				val connectionJdbc = databaseName match {
+					case "snowflake" => new SnowflakeConnection(connectionDetail)
+					case _ => new SimpleConnection(connectionDetail)
+				}
+				connectionDictionary += (connectionName -> connectionJdbc)
+				connectionJdbc
+		}
+	}
+
+	private def getConnectionDetail(connectionName: String): Map[String, String] = {
+		connectionConf.getOrElse(connectionName,
+			throw new Exception(s"Connection $connectionName not found in connection.conf file"))
+	}
+}
+
