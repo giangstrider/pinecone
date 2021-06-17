@@ -11,7 +11,8 @@ case class PineconeConf(
 case class PineconeDatabaseConf(
     connectionName: String,
     schemaName: String,
-    databaseName: String
+    databaseName: String,
+    queriesTableName: String
 )
 
 case class PineconeProxyConf(

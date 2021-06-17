@@ -18,8 +18,8 @@ object Pinecone {
 		}
 	}
 
-	def queriesConf(): Queries = {
-		ConfigSource.resources("queries.conf").load[Queries] match {
+	def queriesConf(): QueriesConf = {
+		ConfigSource.resources("queries.conf").load[QueriesConf] match {
 			case Right(conf) => conf
 		}
 	}
