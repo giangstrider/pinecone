@@ -1,9 +1,8 @@
 package reconciliation
 
-import anorm.SqlParser
+import configuration.Pinecone.pineconeConf
 
-object Executor {
-	private val reconQueriesParser = SqlParser.folder(Map.empty[String, Any]) { (map, value, meta) =>
-		Right(map + (meta.column.alias.get -> value))
-	}
+
+class Executor {
+	private val strategy = pineconeConf.reconciliation.strategy
 }

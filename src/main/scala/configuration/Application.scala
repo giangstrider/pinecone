@@ -5,7 +5,8 @@ case class PineconeConf(
     database: PineconeDatabaseConf,
     proxy: PineconeProxyConf,
     databaseSupportedDriver: Map[String, String],
-    sqlTemplate: PineconeSQLTemplateConf
+    sqlTemplate: PineconeSQLTemplateConf,
+    reconciliation: PineconeReconciliationConf
 )
 
 case class PineconeDatabaseConf(
@@ -27,4 +28,8 @@ case class PineconeSQLTemplateConf(
     timeZone: String,
     dateFormat: String,
     timestampFormat: String
+)
+
+case class PineconeReconciliationConf(
+    strategy: String
 )
