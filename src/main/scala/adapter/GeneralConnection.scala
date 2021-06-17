@@ -6,14 +6,14 @@ import java.sql.Connection
 import java.util.Properties
 import com.zaxxer.hikari.{HikariConfig, HikariDataSource}
 import anorm.{BatchSql, NamedParameter, RowParser, SQL, ToParameterList}
-import configuration.Pinecone.{connectionConf, pineconeConf}
+import configuration.Pinecone.connectionConf
 import exception.PineconeExceptionHandler.exceptionStop
-
+import reconciliation.QueryResult
 import scala.util.{Failure, Success, Try}
 
 
 abstract class GeneralConnection(val config: Map[String, String]) {
-	private implicit val connection: Connection = getConnection
+	protected implicit val connection: Connection = getConnection
 
 	protected def getDriver: String
 
