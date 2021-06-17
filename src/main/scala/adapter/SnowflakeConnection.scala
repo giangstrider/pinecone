@@ -28,7 +28,7 @@ class SnowflakeConnection(override val config: Map[String, String]) extends Gene
 	}
 
 	def fetch(asyncQueries: List[SnowflakeAsyncQuery]): List[ExecutedQuery] = {
-		val queryStatusRecursive = (queryStatus: QueryStatus) => {
+		def queryStatusRecursive(queryStatus: QueryStatus): Unit = {
 			Thread.sleep(2000)
 			if(queryStatus == QueryStatus.RUNNING) queryStatusRecursive(queryStatus)
 		}
