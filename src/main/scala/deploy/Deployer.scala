@@ -26,9 +26,7 @@ object Deployer {
 	}
 
 	private def compareByKey(config: PrepareQuery, connection: PrepareQuery): Boolean = {
-		config.queryKey == connection.queryKey &&
-		config.sourceName == connection.sourceName &&
-		config.targetName == connection.targetName
+		config.queryKey == connection.queryKey
 	}
 
 	private def convertConfToPrepareQuery(query: QueryConf): PrepareQuery = {
@@ -36,7 +34,7 @@ object Deployer {
 			query.queryKey,
 			query.sourceName, getTextFromSQLMethod(query.sourceQuery),
 			query.targetName, getTextFromSQLMethod(query.targetQuery),
-			query.acceptedDeviation
+			query.acceptedDeviation, query.reconcileKey
 		)
 	}
 
