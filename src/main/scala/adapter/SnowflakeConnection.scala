@@ -5,7 +5,8 @@ import net.snowflake.client.core.QueryStatus
 import net.snowflake.client.jdbc.{SnowflakeResultSet, SnowflakeStatement, SnowflakeConnection => CoreSnowflakeConnection}
 import reconciliation.QueryStage.{ExecutedQuery, ExecutionQuery}
 import exception.PineconeExceptionHandler.exceptionStop
-import reconciliation.{QueryRecord, QueryResult}
+import reconciliation.{QueryColumn, QueryRecord}
+
 import java.sql.ResultSet
 
 case class SnowflakeAsyncQuery(
@@ -39,20 +40,23 @@ class SnowflakeConnection(override val config: Map[String, String]) extends Gene
 
 			queryStatus match {
 				case QueryStatus.SUCCESS => ExecutedQuery(
-					asyncQuery.executionQuery.queryKey, resultSetToQueryResult(resultSet), asyncQuery.executionQuery.isTarget
+					asyncQuery.executionQuery.queryKey,
+					resultSetToQueryResult(resultSet, asyncQuery.executionQuery.reconcileKey),
+					asyncQuery.executionQuery.isTarget
 				)
 				case _ => exceptionStop(queryStatus.getErrorMessage)
 			}
 		}
 	}
 
-	private def resultSetToQueryResult(rs: ResultSet) : List[QueryResult] = {
+	private def resultSetToQueryResult(rs: ResultSet, reconcileKey: List[String]) : List[QueryRecord] = {
 		val metadata = rs.getMetaData
 		Iterator.from(0).takeWhile(_ => rs.next).map(_ => {
-			val records = (for {i <- 1 to metadata.getColumnCount} yield {
-				QueryRecord(metadata.getColumnName(i), Some(rs.getObject(i)))
+			val columns = (for {i <- 1 to metadata.getColumnCount} yield {
+				QueryColumn(metadata.getColumnName(i), Some(rs.getObject(i)))
 			}).toList
-			QueryResult(records)
+			val key = columns.filter(c => reconcileKey.contains(c.columnName)).mkString("|")
+			QueryRecord(columns, key)
 		}).toList
 	}
 }

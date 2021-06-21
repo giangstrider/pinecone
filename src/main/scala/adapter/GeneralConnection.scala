@@ -8,7 +8,6 @@ import com.zaxxer.hikari.{HikariConfig, HikariDataSource}
 import anorm.{BatchSql, NamedParameter, RowParser, SQL, ToParameterList}
 import configuration.Pinecone.connectionConf
 import exception.PineconeExceptionHandler.exceptionStop
-import reconciliation.QueryResult
 import scala.util.{Failure, Success, Try}
 
 
