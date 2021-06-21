@@ -15,7 +15,8 @@ case class QueryConf(
     sourceQuery: SQLMethod,
     targetName: String,
     targetQuery: SQLMethod,
-    acceptedDeviation: Double = 1
+    acceptedDeviation: Double = 1,
+    reconcileKey: List[String]
 )
 
 case class QueriesConf(
