@@ -19,6 +19,11 @@ case class ReconcileColumn (
     deviation: Double
 )
 
+case class ReconcileKeyColumn (
+    columnName: String,
+    columnValue: String
+)
+
 sealed trait QueryStage {
 	def queryKey: String
 }
@@ -34,7 +39,7 @@ object QueryStage {
 	case class ExecutedQuery private[QueryStage](queryKey: String, result: List[QueryRecord], isTarget: Boolean) extends QueryStage
 
 	case class ReconciliationRecord private[QueryStage](queryKey: String, reconcileKeyValue: String,
-	                                                   reconciliation: List[ReconcileColumn]) extends QueryStage
+	                                                   reconciled: List[ReconcileColumn]) extends QueryStage
 
 	def apply(queryKey: String, sourceName: String, sourceQuery: String, targetName: String, targetQuery: String,
 	          acceptedDeviation: Double, reconcileKey: List[String]): PrepareQuery =
@@ -46,6 +51,6 @@ object QueryStage {
 
 	def apply(queryKey: String, result: List[QueryRecord], isTarget: Boolean): ExecutedQuery = ExecutedQuery(queryKey: String, result: List[QueryRecord], isTarget: Boolean)
 
-	def apply(queryKey: String, reconcileKeyValue: String, reconciliation: List[ReconcileColumn]): ReconciliationRecord =
-		ReconciliationRecord(queryKey: String, reconcileKeyValue: String, reconciliation: List[ReconcileColumn])
+	def apply(queryKey: String, reconcileKeyValue: String, reconciled: List[ReconcileColumn]): ReconciliationRecord =
+		ReconciliationRecord(queryKey: String, reconcileKeyValue: String, reconciled: List[ReconcileColumn])
 }
