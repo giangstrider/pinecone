@@ -17,7 +17,9 @@ object Reconciliation {
 				} else {
 					attributes.map(c => ReconcileColumn(c.columnName, c.columnValue, Some(0), convertDouble(c.columnValue.get), 100))
 				}
-				ReconciliationRecord(prepareQuery.queryKey, queryRecord.reconcileKeyValue, reconciliation)
+				val reconcileKeyColumns = queryRecord.columns.filter(c => prepareQuery.reconcileKey.contains(c.columnName))
+					.map(qc => ReconcileKeyColumn(qc.columnName, qc.columnValue.get.toString))
+				ReconciliationRecord(prepareQuery.queryKey, reconcileKeyColumns, reconciliation)
 			})
 		)
 	}
@@ -45,7 +47,10 @@ object Reconciliation {
 				ReconcileColumn(sc.columnName, Some(sourceValue), Some(targetValue), different, deviation)
 			}
 
-			ReconciliationRecord(prepareQuery.queryKey, pair.head.reconcileKeyValue, reconciliation)
+			val reconcileKeyColumns = sourceColumn.filter(c => prepareQuery.reconcileKey.contains(c.columnName))
+					.map(qc => ReconcileKeyColumn(qc.columnName, qc.columnValue.get.toString))
+
+			ReconciliationRecord(prepareQuery.queryKey, reconcileKeyColumns, reconciliation)
 		}.toList
 
 		matchedPair ++ missedSourceRecords.get ++ missedTargetRecords.get
