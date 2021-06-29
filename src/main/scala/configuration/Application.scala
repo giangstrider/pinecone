@@ -31,5 +31,6 @@ case class PineconeSQLTemplateConf(
 )
 
 case class PineconeReconciliationConf(
-    strategy: String
+    strategy: String,
+    decimalScale: Int
 )
