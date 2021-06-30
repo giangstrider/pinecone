@@ -12,18 +12,26 @@ class ReconciliationUnitTest extends AnyFlatSpec {
 	}
 
 	"A matched single pair" should "return POSITIVE when SOURCE GREATER than TARGET" in {
-		reconcileTest(ReconciliationSampleData.SingleMatchQueryKey.sourceGreaterThanTarget)
+		reconcileTest(ReconciliationSampleData.GeneralSingleQueryKeyAndReconcileKey.sourceGreaterThanTarget)
 	}
 
 	it should "return NEGATIVE when TARGET GREATER than SOURCE" in {
-		reconcileTest(ReconciliationSampleData.SingleMatchQueryKey.targetGreaterThanSource)
+		reconcileTest(ReconciliationSampleData.GeneralSingleQueryKeyAndReconcileKey.targetGreaterThanSource)
 	}
 
 	it should "return 100% deviation when TARGET missing ReconcileKey compare to SOURCE" in {
-		reconcileTest(ReconciliationSampleData.SingleMatchQueryKey.targetMissingReconcileKeyOfSource)
+		reconcileTest(ReconciliationSampleData.GeneralSingleQueryKeyAndReconcileKey.targetMissingReconcileKeyOfSource)
 	}
 
 	it should "return 100% deviation when for both side which miss keys from each other" in {
-		reconcileTest(ReconciliationSampleData.SingleMatchQueryKey.bothMissingReconcileKeyOfEachOther)
+		reconcileTest(ReconciliationSampleData.GeneralSingleQueryKeyAndReconcileKey.bothMissingReconcileKeyOfEachOther)
+	}
+
+	"Column different" should "be indicated when SOURCE miss attributes compare to TARGET" in {
+		reconcileTest(ReconciliationSampleData.ColumnDifferent.sourceMissAttributesCompareToTarget)
+	}
+
+	it should "be indicated when TARGET miss attributes compare to SOURCE" in {
+		reconcileTest(ReconciliationSampleData.ColumnDifferent.targetMissAttributesCompareToSource)
 	}
 }
