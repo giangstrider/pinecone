@@ -8,6 +8,7 @@ import exception.PineconeExceptionHandler.exceptionStop
 import reconciliation.{QueryColumn, QueryRecord}
 
 import java.sql.ResultSet
+import scala.annotation.tailrec
 
 case class SnowflakeAsyncQuery(
     snowflakeQueryId: String,
@@ -29,7 +30,7 @@ class SnowflakeConnection(override val config: Map[String, String]) extends Gene
 	}
 
 	def fetch(asyncQueries: List[SnowflakeAsyncQuery]): List[ExecutedQuery] = {
-		def queryStatusRecursive(queryStatus: QueryStatus): Unit = {
+		@tailrec def queryStatusRecursive(queryStatus: QueryStatus): Unit = {
 			Thread.sleep(2000)
 			if(queryStatus == QueryStatus.RUNNING) queryStatusRecursive(queryStatus)
 		}
@@ -49,14 +50,24 @@ class SnowflakeConnection(override val config: Map[String, String]) extends Gene
 		}
 	}
 
-	private def resultSetToQueryResult(rs: ResultSet, reconcileKey: List[String]) : List[QueryRecord] = {
+	private def resultSetToQueryResult(rs: ResultSet, reconcileKey: List[String]) : Option[List[QueryRecord]] = {
 		val metadata = rs.getMetaData
-		Iterator.from(0).takeWhile(_ => rs.next).map(_ => {
+
+		val result = Iterator.from(0).takeWhile(_ => rs.next).map(_ => {
 			val columns = (for {i <- 1 to metadata.getColumnCount} yield {
-				QueryColumn(metadata.getColumnName(i), Some(rs.getObject(i)))
+				QueryColumn(metadata.getColumnName(i),
+					Some(rs.getObject(i)),
+					metadata.getColumnClassName(i),
+					metadata.isNullable(i) match {
+						case 0 => false
+						case _ => true
+					}
+				)
 			}).toList
 			val key = columns.filter(c => reconcileKey.contains(c.columnName)).mkString("|")
 			QueryRecord(columns, key)
 		}).toList
+
+		if(result.nonEmpty) Some(result) else None
 	}
 }

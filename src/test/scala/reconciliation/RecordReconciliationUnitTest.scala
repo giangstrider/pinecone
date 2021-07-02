@@ -1,13 +1,13 @@
 package reconciliation
 
 import org.scalatest.flatspec.AnyFlatSpec
-import reconciliation.QueryStage.{ExecutedQuery, PrepareQuery, ReconciliationRecord}
+import reconciliation.QueryStage.{PrepareQuery, ReconciliationRecord}
 
 
-class ReconciliationUnitTest extends AnyFlatSpec {
-	private def reconcileTest(sampleData: (ExecutedQuery, ExecutedQuery, PrepareQuery, List[ReconciliationRecord])) = {
-		val (sourceQuery, targetQuery, prepareQuery, expectedReconciliation) = sampleData
-		val results = Reconciliation.reconcile(sourceQuery, targetQuery, prepareQuery)
+class RecordReconciliationUnitTest extends AnyFlatSpec {
+	private def reconcileTest(sampleData: (Option[List[QueryRecord]], Option[List[QueryRecord]], PrepareQuery, List[ReconciliationRecord])) = {
+		val (sourceRecords, targetRecords, prepareQuery, expectedReconciliation) = sampleData
+		val results = RecordReconciliation.reconcile(sourceRecords, targetRecords, prepareQuery)
 		assert(expectedReconciliation === results)
 	}
 

@@ -6,14 +6,15 @@ sealed trait ReconcileTypedColumn {
 }
 
 object ReconcileTypedColumn {
-	case class NumberColumn[N](columnName: String, source: N, target: N, different: N, deviation: Double,
+	case class NumberColumn[N](columnName: String, source: Option[N], target: Option[N], different: N,
+	                           deviation: Double,
 	                        isMatched: Boolean) extends ReconcileTypedColumn
 	case class StringLikeColumn[S](columnName: String, source: Option[S], target: Option[S],
 	                              isMatched: Boolean)
 		extends
 		ReconcileTypedColumn
 
-	def apply[N](columnName: String, source: N, target: N, different: N, deviation: Double,
+	def apply[N](columnName: String, source: Option[N], target: Option[N], different: N, deviation: Double,
 	          isMatched: Boolean) =
 		NumberColumn(columnName, source, target, different, deviation, isMatched)
 
