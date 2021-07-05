@@ -9,8 +9,17 @@ case class QueryRecord (
 case class QueryColumn (
     columnName: String,
     columnValue: Option[Any],
-    jvmClassName: String,
-    nullable: Boolean = true
+    metadata: QueryMetadataColumn
+)
+
+case class QueryMetadataColumn (
+	clazz: Class[_],
+	displaySize: Int,
+	precision: Int,
+	scale: Int,
+	isCaseSensitive: Boolean,
+	isCurrency: Boolean,
+	isNullable: Boolean
 )
 
 case class ReconcileKeyColumn (
@@ -30,11 +39,17 @@ object QueryStage {
 	case class ExecutionQuery private[QueryStage](queryKey: String, connectionName: String, query: String,
 	                                              isTarget: Boolean, reconcileKey: List[String]) extends QueryStage
 
-	case class ExecutedQuery private[QueryStage](queryKey: String, result: Option[List[QueryRecord]], isTarget: Boolean) extends QueryStage
+	case class ExecutedQuery private[QueryStage](queryKey: String, result: Option[List[QueryRecord]],
+	                                             isTarget: Boolean) extends QueryStage
 
 	case class ReconciliationRecord private[QueryStage](queryKey: String, reconcileKeys: List[ReconcileKeyColumn],
 	                                                    reconciled: List[ReconcileTypedColumn]
 	                                                   ) extends QueryStage
+
+	case class ReconciliationQuery private[QueryStage](queryKey: String,
+	                                                   records: Option[List[ReconciliationRecord]],
+	                                                   clazz: Option[List[ReconcileClassColumn]],
+	                                                   nullable: Option[List[ReconcileNullableColumn]])
 
 	def apply(queryKey: String, sourceName: String, sourceQuery: String, targetName: String, targetQuery: String,
 	          acceptedDeviation: Double, reconcileKey: List[String]) =
@@ -47,4 +62,7 @@ object QueryStage {
 
 	def apply(queryKey: String, reconcileKeys: List[ReconcileKeyColumn], reconciled: List[ReconcileTypedColumn]) =
 		ReconciliationRecord(queryKey, reconcileKeys, reconciled)
+
+	def apply(queryKey: String, records: Option[List[ReconciliationRecord]], clazz: Option[List[ReconcileClassColumn]], nullable: Option[List[ReconcileNullableColumn]]) =
+		ReconciliationQuery(queryKey, records, clazz, nullable)
 }

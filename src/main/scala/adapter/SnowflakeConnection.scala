@@ -5,9 +5,6 @@ import net.snowflake.client.core.QueryStatus
 import net.snowflake.client.jdbc.{SnowflakeResultSet, SnowflakeStatement, SnowflakeConnection => CoreSnowflakeConnection}
 import reconciliation.QueryStage.{ExecutedQuery, ExecutionQuery}
 import exception.PineconeExceptionHandler.exceptionStop
-import reconciliation.{QueryColumn, QueryRecord}
-
-import java.sql.ResultSet
 import scala.annotation.tailrec
 
 case class SnowflakeAsyncQuery(
@@ -16,11 +13,12 @@ case class SnowflakeAsyncQuery(
     executionQuery: ExecutionQuery
 )
 
-class SnowflakeConnection(override val config: Map[String, String]) extends GeneralConnection(config) {
+
+class SnowflakeConnection(override val config: Map[String, String]) extends GeneralConnection(config) with PineconeExecutionUtility {
 	protected def getDriver: String =  pineconeConf.databaseSupportedDriver.getOrElse("snowflake",
 			throw new Exception(s"Database snowflake not supported by Pinecone yet"))
 
-	def submit(queries: List[ExecutionQuery]): List[SnowflakeAsyncQuery] = {
+	def submitPineconeExecution(queries: List[ExecutionQuery]): List[SnowflakeAsyncQuery] = {
 		val statement = this.connection.createStatement
 		for {executionQuery <- queries} yield {
 			val queryId = statement.unwrap(classOf[SnowflakeStatement]).executeAsyncQuery(executionQuery.query)
@@ -29,7 +27,7 @@ class SnowflakeConnection(override val config: Map[String, String]) extends Gene
 		}
 	}
 
-	def fetch(asyncQueries: List[SnowflakeAsyncQuery]): List[ExecutedQuery] = {
+	def fetchPineconeExecution(asyncQueries: List[SnowflakeAsyncQuery]): List[ExecutedQuery] = {
 		@tailrec def queryStatusRecursive(queryStatus: QueryStatus): Unit = {
 			Thread.sleep(2000)
 			if(queryStatus == QueryStatus.RUNNING) queryStatusRecursive(queryStatus)
@@ -40,34 +38,9 @@ class SnowflakeConnection(override val config: Map[String, String]) extends Gene
 			queryStatusRecursive(queryStatus)
 
 			queryStatus match {
-				case QueryStatus.SUCCESS => ExecutedQuery(
-					asyncQuery.executionQuery.queryKey,
-					resultSetToQueryResult(resultSet, asyncQuery.executionQuery.reconcileKey),
-					asyncQuery.executionQuery.isTarget
-				)
+				case QueryStatus.SUCCESS => getQueryResult(resultSet, asyncQuery.executionQuery)
 				case _ => exceptionStop(queryStatus.getErrorMessage)
 			}
 		}
-	}
-
-	private def resultSetToQueryResult(rs: ResultSet, reconcileKey: List[String]) : Option[List[QueryRecord]] = {
-		val metadata = rs.getMetaData
-
-		val result = Iterator.from(0).takeWhile(_ => rs.next).map(_ => {
-			val columns = (for {i <- 1 to metadata.getColumnCount} yield {
-				QueryColumn(metadata.getColumnName(i),
-					Some(rs.getObject(i)),
-					metadata.getColumnClassName(i),
-					metadata.isNullable(i) match {
-						case 0 => false
-						case _ => true
-					}
-				)
-			}).toList
-			val key = columns.filter(c => reconcileKey.contains(c.columnName)).mkString("|")
-			QueryRecord(columns, key)
-		}).toList
-
-		if(result.nonEmpty) Some(result) else None
 	}
 }
