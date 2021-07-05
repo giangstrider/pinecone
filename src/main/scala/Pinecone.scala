@@ -1,9 +1,10 @@
 import configuration.Pinecone.pineconeConf
-import reconciliation.Controller
+import deploy.Deployer
 
 object Pinecone {
 	def main(args : Array[String]): Unit = {
 		init
+		Deployer.deploy
 	}
 
 	def init {

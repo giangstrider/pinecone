@@ -18,7 +18,9 @@ class SnowflakeConnection(override val config: Map[String, String]) extends Gene
 	protected def getDriver: String =  pineconeConf.databaseSupportedDriver.getOrElse("snowflake",
 			throw new Exception(s"Database snowflake not supported by Pinecone yet"))
 
-	def submitPineconeExecution(queries: List[ExecutionQuery]): List[SnowflakeAsyncQuery] = {
+	def getPineconeExecution(queries: List[ExecutionQuery]): List[ExecutedQuery] = fetch(submit(queries))
+
+	def submit(queries: List[ExecutionQuery]): List[SnowflakeAsyncQuery] = {
 		val statement = this.connection.createStatement
 		for {executionQuery <- queries} yield {
 			val queryId = statement.unwrap(classOf[SnowflakeStatement]).executeAsyncQuery(executionQuery.query)
@@ -27,7 +29,7 @@ class SnowflakeConnection(override val config: Map[String, String]) extends Gene
 		}
 	}
 
-	def fetchPineconeExecution(asyncQueries: List[SnowflakeAsyncQuery]): List[ExecutedQuery] = {
+	def fetch(asyncQueries: List[SnowflakeAsyncQuery]): List[ExecutedQuery] = {
 		@tailrec def queryStatusRecursive(queryStatus: QueryStatus): Unit = {
 			Thread.sleep(2000)
 			if(queryStatus == QueryStatus.RUNNING) queryStatusRecursive(queryStatus)

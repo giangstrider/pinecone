@@ -1,0 +1,1 @@
+select to_date(conv) as "TradingDate", sum(OrderTotal), count(*) from (select *, do_created as conv from KSFPA.OMS.CUSTOMERORDER where year(do_created) = ${past_date(1).year}) where  "TradingDate" = '${past_date(1)}' group by "TradingDate" order by "TradingDate"

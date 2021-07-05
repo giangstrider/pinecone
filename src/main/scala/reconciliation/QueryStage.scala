@@ -47,9 +47,7 @@ object QueryStage {
 	                                                   ) extends QueryStage
 
 	case class ReconciliationQuery private[QueryStage](queryKey: String,
-	                                                   records: Option[List[ReconciliationRecord]],
-	                                                   clazz: Option[List[ReconcileClassColumn]],
-	                                                   nullable: Option[List[ReconcileNullableColumn]])
+	                                                   records: Option[List[ReconciliationRecord]])
 
 	def apply(queryKey: String, sourceName: String, sourceQuery: String, targetName: String, targetQuery: String,
 	          acceptedDeviation: Double, reconcileKey: List[String]) =
@@ -63,6 +61,6 @@ object QueryStage {
 	def apply(queryKey: String, reconcileKeys: List[ReconcileKeyColumn], reconciled: List[ReconcileTypedColumn]) =
 		ReconciliationRecord(queryKey, reconcileKeys, reconciled)
 
-	def apply(queryKey: String, records: Option[List[ReconciliationRecord]], clazz: Option[List[ReconcileClassColumn]], nullable: Option[List[ReconcileNullableColumn]]) =
-		ReconciliationQuery(queryKey, records, clazz, nullable)
+	def apply(queryKey: String, records: Option[List[ReconciliationRecord]]) =
+		ReconciliationQuery(queryKey, records)
 }
