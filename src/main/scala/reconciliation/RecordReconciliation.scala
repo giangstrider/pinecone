@@ -28,7 +28,7 @@ object RecordReconciliation {
 						attributesT.find(c => sc.columnName == c.columnName) match {
 							case Some(tc) =>
 								val value = convertToReconcileColumn(sc.columnValue, tc.columnValue)
-								val clazz = classReconcile(Some(sc.columnValue), Some(tc.columnValue))
+								val clazz = classReconcile(sc.columnValue.get, tc.columnValue.get)
 								val meta = Some(metadataReconcile(sc.metadata, tc.metadata, clazz))
 								val isReconcileKey = checkReconcileKey(sc.columnName)
 								ReconciledColumn(sc.columnName, isReconcileKey, value, meta)
@@ -175,7 +175,7 @@ object RecordReconciliation {
 	}
 
 	def classReconcile(source: Any, target: Any): ReconciledMetadataRecord = {
-		if(source.getClass == target.getClass) return ReconciledMetadataRecord(source, target, Convertible.Good)
+		if(source.getClass == target.getClass) return ReconciledMetadataRecord(source.getClass, target.getClass, Convertible.Good)
 
 		val checkNumeric = (v: Any) => v.isInstanceOf[Int] || v.isInstanceOf[Long] || v.isInstanceOf[Short]
 		val checkBigNumeric = (v: Any) => v.isInstanceOf[BigInt]
@@ -195,7 +195,7 @@ object RecordReconciliation {
 		val convertible = if (sourceCompareTarget == targetCompareSource || sourceCompareTarget > targetCompareSource)
 			sourceCompareTarget
 		else targetCompareSource
-		ReconciledMetadataRecord(source, target, convertible)
+		ReconciledMetadataRecord(source.getClass, target.getClass, convertible)
 	}
 
 	private def setScale(number: Double): Double = {

@@ -13,6 +13,39 @@ object ReconciliationSampleData {
 		cal.set(Calendar.DAY_OF_MONTH, 15);
 		cal.getTime
 	}
+	val sampleDummyMetadata = Some(QueryMetadataColumn(30, 20, 0, false, false))
+	val dummyAuditDateReconciledMetadata = Some(ReconcileMetadataColumn(
+		ReconciledMetadataRecord(sampleAuditDate.getClass, sampleAuditDate.getClass, Convertible.Good),
+		ReconciledMetadataRecord(30, 30, Convertible.Good),
+		ReconciledMetadataRecord(20, 20, Convertible.Good),
+		ReconciledMetadataRecord(0, 0, Convertible.Good),
+		ReconciledMetadataRecord(false, false, Convertible.Good),
+		ReconciledMetadataRecord(false, false, Convertible.Good)
+	))
+	val dummyStringDateReconciledMetadata = Some(ReconcileMetadataColumn(
+		ReconciledMetadataRecord("Pinecone".getClass, "Pinecone".getClass, Convertible.Good),
+		ReconciledMetadataRecord(30, 30, Convertible.Good),
+		ReconciledMetadataRecord(20, 20, Convertible.Good),
+		ReconciledMetadataRecord(0, 0, Convertible.Good),
+		ReconciledMetadataRecord(false, false, Convertible.Good),
+		ReconciledMetadataRecord(false, false, Convertible.Good)
+	))
+	val dummyIntegerDateReconciledMetadata = Some(ReconcileMetadataColumn(
+		ReconciledMetadataRecord(0.asInstanceOf[Integer].getClass, 0.asInstanceOf[Integer].getClass, Convertible.Good),
+		ReconciledMetadataRecord(30, 30, Convertible.Good),
+		ReconciledMetadataRecord(20, 20, Convertible.Good),
+		ReconciledMetadataRecord(0, 0, Convertible.Good),
+		ReconciledMetadataRecord(false, false, Convertible.Good),
+		ReconciledMetadataRecord(false, false, Convertible.Good)
+	))
+	val dummyDoubleDateReconciledMetadata = Some(ReconcileMetadataColumn(
+		ReconciledMetadataRecord((1.0: java.lang.Double).getClass, (1.0: java.lang.Double).getClass, Convertible.Good),
+		ReconciledMetadataRecord(30, 30, Convertible.Good),
+		ReconciledMetadataRecord(20, 20, Convertible.Good),
+		ReconciledMetadataRecord(0, 0, Convertible.Good),
+		ReconciledMetadataRecord(false, false, Convertible.Good),
+		ReconciledMetadataRecord(false, false, Convertible.Good)
+	))
 
 	object GeneralSingleQueryKeyAndReconcileKey {
 		val sourceGreaterThanTarget = {
@@ -28,23 +61,23 @@ object ReconciliationSampleData {
 			val sourceRecords = List(
 				QueryRecord(
 					List(
-						QueryColumn("department", Some("Technology"), "java.lang.String"),
-						QueryColumn("transaction_date", Some("2021-06-10"), "java.sql.Date"),
-						QueryColumn("store_name", Some("Pinecone"), "java.lang.String"),
-						QueryColumn("audit_date", Some(sampleAuditDate), "java.util.Date"),
-						QueryColumn("count", Some(10821), "java.lang.Integer"),
-						QueryColumn("sales", Some(15630330.46), "java.lang.Double")
+						QueryColumn("department", Some("Technology"), sampleDummyMetadata),
+						QueryColumn("transaction_date", Some("2021-06-10"), sampleDummyMetadata),
+						QueryColumn("store_name", Some("Pinecone"), sampleDummyMetadata),
+						QueryColumn("audit_date", Some(sampleAuditDate), sampleDummyMetadata),
+						QueryColumn("count", Some(10821), sampleDummyMetadata),
+						QueryColumn("sales", Some(15630330.46), sampleDummyMetadata)
 					),
 					"Technology|2021-06-10"
 				),
 				QueryRecord(
 					List(
-						QueryColumn("department", Some("Fashion"), "java.lang.String"),
-						QueryColumn("transaction_date", Some("2021-06-10"), "java.sql.Date"),
-						QueryColumn("store_name", Some("Pinecone"), "java.lang.String"),
-						QueryColumn("audit_date", Some(sampleAuditDate), "java.util.Date"),
-						QueryColumn("count", Some(47532), "java.lang.Integer"),
-						QueryColumn("sales", Some(37680362.15), "java.lang.Double")
+						QueryColumn("department", Some("Fashion"), sampleDummyMetadata),
+						QueryColumn("transaction_date", Some("2021-06-10"), sampleDummyMetadata),
+						QueryColumn("store_name", Some("Pinecone"), sampleDummyMetadata),
+						QueryColumn("audit_date", Some(sampleAuditDate), sampleDummyMetadata),
+						QueryColumn("count", Some(47532), sampleDummyMetadata),
+						QueryColumn("sales", Some(37680362.15), sampleDummyMetadata)
 					),
 					"Fashion|2021-06-10"
 				)
@@ -53,23 +86,23 @@ object ReconciliationSampleData {
 			val targetRecords = List(
 				QueryRecord(
 					List(
-						QueryColumn("department", Some("Technology"), "java.lang.String"),
-						QueryColumn("transaction_date", Some("2021-06-10"), "java.sql.Date"),
-						QueryColumn("store_name", Some("Pinecone"), "java.lang.String"),
-						QueryColumn("audit_date", Some(sampleAuditDate), "java.util.Date"),
-						QueryColumn("count", Some(10065), "java.lang.Integer"),
-						QueryColumn("sales", Some(15630320.46), "java.lang.Double")
+						QueryColumn("department", Some("Technology"), sampleDummyMetadata),
+						QueryColumn("transaction_date", Some("2021-06-10"), sampleDummyMetadata),
+						QueryColumn("store_name", Some("Pinecone"), sampleDummyMetadata),
+						QueryColumn("audit_date", Some(sampleAuditDate), sampleDummyMetadata),
+						QueryColumn("count", Some(10065), sampleDummyMetadata),
+						QueryColumn("sales", Some(15630320.46), sampleDummyMetadata)
 					),
 					"Technology|2021-06-10"
 				),
 				QueryRecord(
 					List(
-						QueryColumn("department", Some("Fashion"), "java.lang.String"),
-						QueryColumn("transaction_date", Some("2021-06-10"), "java.sql.Date"),
-						QueryColumn("store_name", Some("Pinecone"), "java.lang.String"),
-						QueryColumn("audit_date", Some(sampleAuditDate), "java.util.Date"),
-						QueryColumn("count", Some(47531), "java.lang.Integer"),
-						QueryColumn("sales", Some(37680322.15), "java.lang.Double")
+						QueryColumn("department", Some("Fashion"), sampleDummyMetadata),
+						QueryColumn("transaction_date", Some("2021-06-10"), sampleDummyMetadata),
+						QueryColumn("store_name", Some("Pinecone"), sampleDummyMetadata),
+						QueryColumn("audit_date", Some(sampleAuditDate), sampleDummyMetadata),
+						QueryColumn("count", Some(47531), sampleDummyMetadata),
+						QueryColumn("sales", Some(37680322.15), sampleDummyMetadata)
 					),
 					"Fashion|2021-06-10"
 				)
@@ -79,30 +112,25 @@ object ReconciliationSampleData {
 				ReconciliationRecord(
 					queryKey,
 					List(
-						ReconcileKeyColumn("department", "Fashion"),
-						ReconcileKeyColumn("transaction_date", "2021-06-10"),
-					),
-					List(
-						StringLikeColumn("audit_date", Some(sampleAuditDate), Some(sampleAuditDate), isMatched = true),
-						NumberColumn[Double]("count", Some(47532.0), Some(47531.0), 1.0, 0.0021038458, isMatched = false),
-						NumberColumn[Double]("sales", Some(37680362.15), Some(37680322.15), 40.0, 0.0001061561, isMatched = false),
-						StringLikeColumn("store_name", Some("Pinecone"), Some("Pinecone"), isMatched = true)
+						ReconciledColumn("audit_date", false, StringLikeColumn(Some(sampleAuditDate), Some(sampleAuditDate), isMatched = true), dummyAuditDateReconciledMetadata),
+						ReconciledColumn("count", false, NumberColumn[Double](Some(47532.0), Some(47531.0), 1.0, 0.0021038458, isMatched = false), dummyIntegerDateReconciledMetadata),
+						ReconciledColumn("department", true, StringLikeColumn(Some("Fashion"), Some("Fashion"), true), dummyStringDateReconciledMetadata),
+						ReconciledColumn("sales", false, NumberColumn[Double](Some(37680362.15), Some(37680322.15), 40.0, 0.0001061561, isMatched = false), dummyDoubleDateReconciledMetadata),
+						ReconciledColumn("store_name", false, StringLikeColumn(Some("Pinecone"), Some("Pinecone"), isMatched = true), dummyStringDateReconciledMetadata),
+						ReconciledColumn("transaction_date", true, StringLikeColumn(Some("2021-06-10"), Some("2021-06-10"), true), dummyStringDateReconciledMetadata),
 					)
 				),
 				ReconciliationRecord(
 					queryKey,
 					List(
-						ReconcileKeyColumn("department", "Technology"),
-						ReconcileKeyColumn("transaction_date", "2021-06-10"),
-					),
-					List(
-						StringLikeColumn("audit_date", Some(sampleAuditDate), Some(sampleAuditDate), isMatched = true),
-						NumberColumn[Double]("count", Some(10821.0), Some(10065.0), 756, 6.9864153036, isMatched = false),
-						NumberColumn[Double]("sales", Some(15630330.46), Some(15630320.46), 10.0, 0.0000639782, isMatched = false),
-						StringLikeColumn("store_name", Some("Pinecone"), Some("Pinecone"), isMatched = true)
+						ReconciledColumn("audit_date" ,false, StringLikeColumn(Some(sampleAuditDate), Some(sampleAuditDate), isMatched = true), dummyAuditDateReconciledMetadata),
+						ReconciledColumn("count" ,false, NumberColumn[Double](Some(10821.0), Some(10065.0), 756, 6.9864153036, isMatched = false), dummyIntegerDateReconciledMetadata),
+						ReconciledColumn("department", true, StringLikeColumn(Some("Technology"), Some("Technology"), true), dummyStringDateReconciledMetadata),
+						ReconciledColumn("sales" ,false, NumberColumn[Double](Some(15630330.46), Some(15630320.46), 10.0, 0.0000639782, isMatched = false), dummyDoubleDateReconciledMetadata),
+						ReconciledColumn("store_name", false, StringLikeColumn(Some("Pinecone"), Some("Pinecone"), isMatched = true), dummyStringDateReconciledMetadata),
+						ReconciledColumn("transaction_date", true, StringLikeColumn(Some("2021-06-10"), Some("2021-06-10"), true), dummyStringDateReconciledMetadata))
 					)
 				)
-			)
 
 			(Some(sourceRecords), Some(targetRecords), prepareQuery, expectedReconciliation)
 		}
@@ -120,19 +148,19 @@ object ReconciliationSampleData {
 			val sourceRecords = List(
 				QueryRecord(
 					List(
-						QueryColumn("department", Some("Technology"), "java.lang.String"),
-						QueryColumn("transaction_date", Some("2021-06-10"), "java.sql.Date"),
-						QueryColumn("count", Some(10065), "java.lang.Integer"),
-						QueryColumn("sales", Some(15630320.46), "java.lang.Double")
+						QueryColumn("department", Some("Technology"), sampleDummyMetadata),
+						QueryColumn("transaction_date", Some("2021-06-10"), sampleDummyMetadata),
+						QueryColumn("count", Some(10065), sampleDummyMetadata),
+						QueryColumn("sales", Some(15630320.46), sampleDummyMetadata)
 					),
 					"Technology|2021-06-10"
 				),
 				QueryRecord(
 					List(
-						QueryColumn("department", Some("Fashion"), "java.lang.String"),
-						QueryColumn("transaction_date", Some("2021-06-10"), "java.sql.Date"),
-						QueryColumn("count", Some(47531), "java.lang.Integer"),
-						QueryColumn("sales", Some(37680322.15), "java.lang.Double")
+						QueryColumn("department", Some("Fashion"), sampleDummyMetadata),
+						QueryColumn("transaction_date", Some("2021-06-10"), sampleDummyMetadata),
+						QueryColumn("count", Some(47531), sampleDummyMetadata),
+						QueryColumn("sales", Some(37680322.15), sampleDummyMetadata)
 					),
 					"Fashion|2021-06-10"
 				)
@@ -141,19 +169,19 @@ object ReconciliationSampleData {
 			val targetRecords = List(
 				QueryRecord(
 					List(
-						QueryColumn("department", Some("Technology"), "java.lang.String"),
-						QueryColumn("transaction_date", Some("2021-06-10"), "java.sql.Date"),
-						QueryColumn("count", Some(10821), "java.lang.Integer"),
-						QueryColumn("sales", Some(15630330.46), "java.lang.Double")
+						QueryColumn("department", Some("Technology"), sampleDummyMetadata),
+						QueryColumn("transaction_date", Some("2021-06-10"), sampleDummyMetadata),
+						QueryColumn("count", Some(10821), sampleDummyMetadata),
+						QueryColumn("sales", Some(15630330.46), sampleDummyMetadata)
 					),
 					"Technology|2021-06-10"
 				),
 				QueryRecord(
 					List(
-						QueryColumn("department", Some("Fashion"), "java.lang.String"),
-						QueryColumn("transaction_date", Some("2021-06-10"), "java.sql.Date"),
-						QueryColumn("count", Some(47532), "java.lang.Integer"),
-						QueryColumn("sales", Some(37680362.15), "java.lang.Double")
+						QueryColumn("department", Some("Fashion"), sampleDummyMetadata),
+						QueryColumn("transaction_date", Some("2021-06-10"), sampleDummyMetadata),
+						QueryColumn("count", Some(47532), sampleDummyMetadata),
+						QueryColumn("sales", Some(37680362.15), sampleDummyMetadata)
 					),
 					"Fashion|2021-06-10"
 				)
@@ -163,23 +191,19 @@ object ReconciliationSampleData {
 				ReconciliationRecord(
 					queryKey,
 					List(
-						ReconcileKeyColumn("department", "Fashion"),
-						ReconcileKeyColumn("transaction_date", "2021-06-10"),
-					),
-					List(
-						NumberColumn[Double]("count", Some(47531.0), Some(47532.0), -1.0, -0.0021038901, isMatched = false),
-						NumberColumn[Double]("sales", Some(37680322.15), Some(37680362.15), -40.0, -0.0001061562, isMatched = false)
+						ReconciledColumn("count" ,false, NumberColumn[Double](Some(47531.0), Some(47532.0), -1.0, -0.0021038901, isMatched = false), dummyIntegerDateReconciledMetadata),
+						ReconciledColumn("department", true, StringLikeColumn(Some("Fashion"), Some("Fashion"), true), dummyStringDateReconciledMetadata),
+						ReconciledColumn("sales" ,false, NumberColumn[Double](Some(37680322.15), Some(37680362.15), -40.0, -0.0001061562, isMatched = false), dummyDoubleDateReconciledMetadata),
+						ReconciledColumn("transaction_date", true, StringLikeColumn(Some("2021-06-10"), Some("2021-06-10"), true), dummyStringDateReconciledMetadata)
 					)
 				),
 				ReconciliationRecord(
 					queryKey,
 					List(
-						ReconcileKeyColumn("department", "Technology"),
-						ReconcileKeyColumn("transaction_date", "2021-06-10"),
-					),
-					List(
-						NumberColumn[Double]("count", Some(10065.0), Some(10821.0), -756, -7.5111773472, isMatched = false),
-						NumberColumn[Double]("sales", Some(15630320.46), Some(15630330.46), -10.0, -0.0000639782, isMatched = false)
+						ReconciledColumn("count" ,false, NumberColumn[Double](Some(10065.0), Some(10821.0), -756, -7.5111773472, isMatched = false), dummyIntegerDateReconciledMetadata),
+						ReconciledColumn("department", true, StringLikeColumn(Some("Technology"), Some("Technology"), true), dummyStringDateReconciledMetadata),
+						ReconciledColumn("sales" ,false, NumberColumn[Double](Some(15630320.46), Some(15630330.46), -10.0, -0.0000639782, isMatched = false), dummyDoubleDateReconciledMetadata),
+						ReconciledColumn("transaction_date", true, StringLikeColumn(Some("2021-06-10"), Some("2021-06-10"), true), dummyStringDateReconciledMetadata)
 					)
 				)
 			)
@@ -200,19 +224,19 @@ object ReconciliationSampleData {
 			val sourceRecords = List(
 				QueryRecord(
 					List(
-						QueryColumn("department", Some("Technology"), "java.lang.String"),
-						QueryColumn("transaction_date", Some("2021-06-10"), "java.sql.Date"),
-						QueryColumn("count", Some(10821), "java.lang.Integer"),
-						QueryColumn("sales", Some(15630330.46), "java.lang.Double")
+						QueryColumn("department", Some("Technology"), sampleDummyMetadata),
+						QueryColumn("transaction_date", Some("2021-06-10"), sampleDummyMetadata),
+						QueryColumn("count", Some(10821), sampleDummyMetadata),
+						QueryColumn("sales", Some(15630330.46), sampleDummyMetadata)
 					),
 					"Technology|2021-06-10"
 				),
 				QueryRecord(
 					List(
-						QueryColumn("department", Some("Technology"), "java.lang.String"),
-						QueryColumn("transaction_date", Some("2021-06-11"), "java.sql.Date"),
-						QueryColumn("count", Some(10409), "java.lang.Integer"),
-						QueryColumn("sales", Some(14630732.52), "java.lang.Double")
+						QueryColumn("department", Some("Technology"), sampleDummyMetadata),
+						QueryColumn("transaction_date", Some("2021-06-11"), sampleDummyMetadata),
+						QueryColumn("count", Some(10409), sampleDummyMetadata),
+						QueryColumn("sales", Some(14630732.52), sampleDummyMetadata)
 					),
 					"Technology|2021-06-11"
 				)
@@ -221,10 +245,10 @@ object ReconciliationSampleData {
 			val targetRecords = List(
 				QueryRecord(
 					List(
-						QueryColumn("department", Some("Technology"), "java.lang.String"),
-						QueryColumn("transaction_date", Some("2021-06-10"), "java.sql.Date"),
-						QueryColumn("count", Some(10821), "java.lang.Integer"),
-						QueryColumn("sales", Some(15630330.46), "java.lang.Double")
+						QueryColumn("department", Some("Technology"), sampleDummyMetadata),
+						QueryColumn("transaction_date", Some("2021-06-10"), sampleDummyMetadata),
+						QueryColumn("count", Some(10821), sampleDummyMetadata),
+						QueryColumn("sales", Some(15630330.46), sampleDummyMetadata)
 					),
 					"Technology|2021-06-10"
 				)
@@ -234,23 +258,19 @@ object ReconciliationSampleData {
 				ReconciliationRecord(
 					queryKey,
 					List(
-						ReconcileKeyColumn("department", "Technology"),
-						ReconcileKeyColumn("transaction_date", "2021-06-10"),
-					),
-					List(
-						NumberColumn[Double]("count", Some(10821.0), Some(10821.0), 0.0, 0.0, isMatched = true),
-						NumberColumn[Double]("sales", Some(15630330.46), Some(15630330.46), 0.0, 0.0, isMatched = true)
+						ReconciledColumn("count", false, NumberColumn[Double](Some(10821.0), Some(10821.0), 0.0, 0.0, isMatched = true), dummyIntegerDateReconciledMetadata),
+						ReconciledColumn("department", true, StringLikeColumn(Some("Technology"), Some("Technology"), true), dummyStringDateReconciledMetadata),
+						ReconciledColumn("sales" ,false, NumberColumn[Double](Some(15630330.46), Some(15630330.46), 0.0, 0.0, isMatched = true), dummyDoubleDateReconciledMetadata),
+						ReconciledColumn("transaction_date", true, StringLikeColumn(Some("2021-06-10"), Some("2021-06-10"), true), dummyStringDateReconciledMetadata)
 					)
 				),
 				ReconciliationRecord(
 					queryKey,
 					List(
-						ReconcileKeyColumn("department", "Technology"),
-						ReconcileKeyColumn("transaction_date", "2021-06-11"),
-					),
-					List(
-						NumberColumn[Double]("count", Some(10409.0), None, 10409.0, 100.0, isMatched = false),
-						NumberColumn[Double]("sales", Some(14630732.52), None, 14630732.52, 100.0, isMatched = false)
+						ReconciledColumn("count", false, NumberColumn[Double](Some(10409.0), None, 10409.0, 100.0, isMatched = false), dummyIntegerDateReconciledMetadata),
+						ReconciledColumn("department", true, StringLikeColumn(Some("Technology"), Some("Technology"), true), dummyStringDateReconciledMetadata),
+						ReconciledColumn("sales" ,false, NumberColumn[Double](Some(14630732.52), None, 14630732.52, 100.0, isMatched = false), dummyDoubleDateReconciledMetadata),
+						ReconciledColumn("transaction_date", true, StringLikeColumn(Some("2021-06-10"), Some("2021-06-10"), true), dummyStringDateReconciledMetadata),
 					)
 				)
 			)
@@ -271,19 +291,19 @@ object ReconciliationSampleData {
 			val sourceRecords = List(
 				QueryRecord(
 					List(
-						QueryColumn("department", Some("Technology"), "java.lang.String"),
-						QueryColumn("transaction_date", Some("2021-06-10"), "java.sql.Date"),
-						QueryColumn("count", Some(10821), "java.lang.Integer"),
-						QueryColumn("sales", Some(15630330.46), "java.lang.Double")
+						QueryColumn("department", Some("Technology"), sampleDummyMetadata),
+						QueryColumn("transaction_date", Some("2021-06-10"), sampleDummyMetadata),
+						QueryColumn("count", Some(10821), sampleDummyMetadata),
+						QueryColumn("sales", Some(15630330.46), sampleDummyMetadata)
 					),
 					"Technology|2021-06-10"
 				),
 				QueryRecord(
 					List(
-						QueryColumn("department", Some("Technology"), "java.lang.String"),
-						QueryColumn("transaction_date", Some("2021-06-11"), "java.sql.Date"),
-						QueryColumn("count", Some(10409), "java.lang.Integer"),
-						QueryColumn("sales", Some(14630732.52), "java.lang.Double")
+						QueryColumn("department", Some("Technology"), sampleDummyMetadata),
+						QueryColumn("transaction_date", Some("2021-06-11"), sampleDummyMetadata),
+						QueryColumn("count", Some(10409), sampleDummyMetadata),
+						QueryColumn("sales", Some(14630732.52), sampleDummyMetadata)
 					),
 					"Technology|2021-06-11"
 				)
@@ -292,10 +312,10 @@ object ReconciliationSampleData {
 			val targetRecords = List(
 				QueryRecord(
 					List(
-						QueryColumn("department", Some("Fashion"), "java.lang.String"),
-						QueryColumn("transaction_date", Some("2021-06-10"), "java.sql.Date"),
-						QueryColumn("count", Some(10821), "java.lang.Integer"),
-						QueryColumn("sales", Some(15630330.46), "java.lang.Double")
+						QueryColumn("department", Some("Fashion"), sampleDummyMetadata),
+						QueryColumn("transaction_date", Some("2021-06-10"), sampleDummyMetadata),
+						QueryColumn("count", Some(10821), sampleDummyMetadata),
+						QueryColumn("sales", Some(15630330.46), sampleDummyMetadata)
 					),
 					"Fashion|2021-06-10"
 				)
@@ -305,34 +325,28 @@ object ReconciliationSampleData {
 				ReconciliationRecord(
 					queryKey,
 					List(
-						ReconcileKeyColumn("department", "Technology"),
-						ReconcileKeyColumn("transaction_date", "2021-06-10"),
-					),
-					List(
-						NumberColumn[Double]("count", Some(10821.0), None, 10821.0, 100.0, isMatched = false),
-						NumberColumn[Double]("sales", Some(15630330.46), None, 15630330.46, 100.0, isMatched = false)
+						ReconciledColumn("count", false, NumberColumn[Double](Some(10821.0), None, 10821.0, 100.0, isMatched = false), dummyIntegerDateReconciledMetadata),
+						ReconciledColumn("department", true, StringLikeColumn(Some("Technology"), Some("Technology"), true), dummyStringDateReconciledMetadata),
+						ReconciledColumn("sales" ,false, NumberColumn[Double](Some(15630330.46), None, 15630330.46, 100.0, isMatched = false), dummyDoubleDateReconciledMetadata),
+						ReconciledColumn("transaction_date", true, StringLikeColumn(Some("2021-06-10"), Some("2021-06-10"), true), dummyStringDateReconciledMetadata)
 					)
 				),
 				ReconciliationRecord(
 					queryKey,
 					List(
-						ReconcileKeyColumn("department", "Technology"),
-						ReconcileKeyColumn("transaction_date", "2021-06-11"),
-					),
-					List(
-						NumberColumn[Double]("count", Some(10409.0), None, 10409.0, 100.0, isMatched = false),
-						NumberColumn[Double]("sales", Some(14630732.52), None, 14630732.52, 100.0, isMatched = false)
+						ReconciledColumn("count", false, NumberColumn[Double](Some(10409.0), None, 10409.0, 100.0, isMatched = false), dummyIntegerDateReconciledMetadata),
+						ReconciledColumn("department", true, StringLikeColumn(Some("Technology"), Some("Technology"), true), dummyStringDateReconciledMetadata),
+						ReconciledColumn("sales", false, NumberColumn[Double](Some(14630732.52), None, 14630732.52, 100.0, isMatched = false), dummyDoubleDateReconciledMetadata),
+						ReconciledColumn("transaction_date", true, StringLikeColumn(Some("2021-06-11"), Some("2021-06-11"), true), dummyStringDateReconciledMetadata)
 					)
 				),
 				ReconciliationRecord(
 					queryKey,
 					List(
-						ReconcileKeyColumn("department", "Fashion"),
-						ReconcileKeyColumn("transaction_date", "2021-06-10"),
-					),
-					List(
-						NumberColumn[Double]("count", None, Some(10821.0), -10821.0, -100.0, isMatched = false),
-						NumberColumn[Double]("sales", None, Some(15630330.46), -15630330.46, -100.0, isMatched = false)
+						ReconciledColumn("count", false, NumberColumn[Double](None, Some(10821.0), -10821.0, -100.0, isMatched = false), dummyIntegerDateReconciledMetadata),
+						ReconciledColumn("department", true, StringLikeColumn(Some("Fashion"), Some("Fashion"), true), dummyStringDateReconciledMetadata),
+						ReconciledColumn("sales", false, NumberColumn[Double](None, Some(15630330.46), -15630330.46, -100.0, isMatched = false), dummyDoubleDateReconciledMetadata),
+						ReconciledColumn("transaction_date", true, StringLikeColumn(Some("2021-06-10"), Some("2021-06-10"), true), dummyStringDateReconciledMetadata)
 					)
 				)
 			)
@@ -355,19 +369,19 @@ object ReconciliationSampleData {
 			val sourceRecords = List(
 				QueryRecord(
 					List(
-						QueryColumn("department", Some("Technology"), "java.lang.String"),
-						QueryColumn("transaction_date", Some("2021-06-10"), "java.sql.Date"),
-						QueryColumn("count", Some(10065), "java.lang.Integer"),
-						QueryColumn("sales", Some(15630320.46), "java.lang.Double")
+						QueryColumn("department", Some("Technology"), sampleDummyMetadata),
+						QueryColumn("transaction_date", Some("2021-06-10"), sampleDummyMetadata),
+						QueryColumn("count", Some(10065), sampleDummyMetadata),
+						QueryColumn("sales", Some(15630320.46), sampleDummyMetadata)
 					),
 					"Technology|2021-06-10"
 				),
 				QueryRecord(
 					List(
-						QueryColumn("department", Some("Fashion"), "java.lang.String"),
-						QueryColumn("transaction_date", Some("2021-06-10"), "java.sql.Date"),
-						QueryColumn("count", Some(47531), "java.lang.Integer"),
-						QueryColumn("sales", Some(37680322.15), "java.lang.Double")
+						QueryColumn("department", Some("Fashion"), sampleDummyMetadata),
+						QueryColumn("transaction_date", Some("2021-06-10"), sampleDummyMetadata),
+						QueryColumn("count", Some(47531), sampleDummyMetadata),
+						QueryColumn("sales", Some(37680322.15), sampleDummyMetadata)
 					),
 					"Fashion|2021-06-10"
 				)
@@ -376,21 +390,21 @@ object ReconciliationSampleData {
 			val targetRecords = List(
 				QueryRecord(
 					List(
-						QueryColumn("department", Some("Technology"), "java.lang.String"),
-						QueryColumn("transaction_date", Some("2021-06-10"), "java.sql.Date"),
-						QueryColumn("audit_date", Some(sampleAuditDate), "java.util.Date"),
-						QueryColumn("count", Some(10821), "java.lang.Integer"),
-						QueryColumn("sales", Some(15630330.46), "java.lang.Double")
+						QueryColumn("department", Some("Technology"), sampleDummyMetadata),
+						QueryColumn("transaction_date", Some("2021-06-10"), sampleDummyMetadata),
+						QueryColumn("audit_date", Some(sampleAuditDate), sampleDummyMetadata),
+						QueryColumn("count", Some(10821), sampleDummyMetadata),
+						QueryColumn("sales", Some(15630330.46), sampleDummyMetadata)
 					),
 					"Technology|2021-06-10"
 				),
 				QueryRecord(
 					List(
-						QueryColumn("department", Some("Fashion"), "java.lang.String"),
-						QueryColumn("transaction_date", Some("2021-06-10"), "java.sql.Date"),
-						QueryColumn("audit_date", Some(sampleAuditDate), "java.util.Date"),
-						QueryColumn("count", Some(47532), "java.lang.Integer"),
-						QueryColumn("sales", Some(37680362.15), "java.lang.Double")
+						QueryColumn("department", Some("Fashion"), sampleDummyMetadata),
+						QueryColumn("transaction_date", Some("2021-06-10"), sampleDummyMetadata),
+						QueryColumn("audit_date", Some(sampleAuditDate), sampleDummyMetadata),
+						QueryColumn("count", Some(47532), sampleDummyMetadata),
+						QueryColumn("sales", Some(37680362.15), sampleDummyMetadata)
 					),
 					"Fashion|2021-06-10"
 				)
@@ -400,25 +414,21 @@ object ReconciliationSampleData {
 				ReconciliationRecord(
 					queryKey,
 					List(
-						ReconcileKeyColumn("department", "Fashion"),
-						ReconcileKeyColumn("transaction_date", "2021-06-10"),
-					),
-					List(
-						NumberColumn[Double]("count", Some(47531.0), Some(47532.0), -1.0, -0.0021038901, isMatched = false),
-						NumberColumn[Double]("sales", Some(37680322.15), Some(37680362.15), -40.0, -0.0001061562, isMatched = false),
-						StringLikeColumn("audit_date", None, Some(sampleAuditDate), isMatched = false)
+						ReconciledColumn("audit_date" ,false, StringLikeColumn(None, Some(sampleAuditDate), isMatched = false), dummyAuditDateReconciledMetadata),
+						ReconciledColumn("count", false, NumberColumn[Double](Some(47531.0), Some(47532.0), -1.0, -0.0021038901, isMatched = false), dummyIntegerDateReconciledMetadata),
+						ReconciledColumn("department", true, StringLikeColumn(Some("Fashion"), Some("Fashion"), true), dummyStringDateReconciledMetadata),
+						ReconciledColumn("sales", false, NumberColumn[Double](Some(37680322.15), Some(37680362.15), -40.0, -0.0001061562, isMatched = false), dummyDoubleDateReconciledMetadata),
+						ReconciledColumn("transaction_date", true, StringLikeColumn(Some("2021-06-10"), Some("2021-06-10"), true), dummyStringDateReconciledMetadata)
 					)
 				),
 				ReconciliationRecord(
 					queryKey,
 					List(
-						ReconcileKeyColumn("department", "Technology"),
-						ReconcileKeyColumn("transaction_date", "2021-06-10"),
-					),
-					List(
-						NumberColumn[Double]("count", Some(10065.0), Some(10821.0), -756, -7.5111773472, isMatched = false),
-						NumberColumn[Double]("sales", Some(15630320.46), Some(15630330.46), -10.0, -0.0000639782, isMatched = false),
-						StringLikeColumn("audit_date", None, Some(sampleAuditDate), isMatched = false)
+						ReconciledColumn("audit_date" ,false, StringLikeColumn(None, Some(sampleAuditDate), isMatched = false), dummyAuditDateReconciledMetadata),
+						ReconciledColumn("count", false, NumberColumn[Double](Some(10065.0), Some(10821.0), -756, -7.5111773472, isMatched = false), dummyIntegerDateReconciledMetadata),
+						ReconciledColumn("department", true, StringLikeColumn(Some("Technology"), Some("Technology"), true), dummyStringDateReconciledMetadata),
+						ReconciledColumn("sales", false, NumberColumn[Double](Some(15630320.46), Some(15630330.46), -10.0, -0.0000639782, isMatched = false), dummyDoubleDateReconciledMetadata),
+						ReconciledColumn("transaction_date", true, StringLikeColumn(Some("2021-06-10"), Some("2021-06-10"), true), dummyStringDateReconciledMetadata)
 					)
 				)
 			)
@@ -439,21 +449,21 @@ object ReconciliationSampleData {
 			val sourceRecords = List(
 				QueryRecord(
 					List(
-						QueryColumn("department", Some("Technology"), "java.lang.String"),
-						QueryColumn("transaction_date", Some("2021-06-10"), "java.sql.Date"),
-						QueryColumn("audit_date", Some(sampleAuditDate), "java.util.Date"),
-						QueryColumn("count", Some(10065), "java.lang.Integer"),
-						QueryColumn("sales", Some(15630320.46), "java.lang.Double")
+						QueryColumn("department", Some("Technology"), Some(QueryMetadataColumn(30, 20, 0, false, false))),
+						QueryColumn("transaction_date", Some("2021-06-10"), Some(QueryMetadataColumn(30, 20, 0, false, false))),
+						QueryColumn("audit_date", Some(sampleAuditDate), Some(QueryMetadataColumn(30, 20, 0, false, false))),
+						QueryColumn("count", Some(10065), Some(QueryMetadataColumn(30, 20, 0, false, false))),
+						QueryColumn("sales", Some(15630320.46), Some(QueryMetadataColumn(30, 20, 0, false, false)))
 					),
 					"Technology|2021-06-10"
 				),
 				QueryRecord(
 					List(
-						QueryColumn("department", Some("Fashion"), "java.lang.String"),
-						QueryColumn("transaction_date", Some("2021-06-10"), "java.sql.Date"),
-						QueryColumn("audit_date", Some(sampleAuditDate), "java.util.Date"),
-						QueryColumn("count", Some(47531), "java.lang.Integer"),
-						QueryColumn("sales", Some(37680322.15), "java.lang.Double")
+						QueryColumn("department", Some("Fashion"), Some(QueryMetadataColumn(30, 20, 0, false, false))),
+						QueryColumn("transaction_date", Some("2021-06-10"), Some(QueryMetadataColumn(30, 20, 0, false, false))),
+						QueryColumn("audit_date", Some(sampleAuditDate), Some(QueryMetadataColumn(30, 20, 0, false, false))),
+						QueryColumn("count", Some(47531), Some(QueryMetadataColumn(30, 20, 0, false, false))),
+						QueryColumn("sales", Some(37680322.15), Some(QueryMetadataColumn(30, 20, 0, false, false)))
 					),
 					"Fashion|2021-06-10"
 				)
@@ -462,19 +472,19 @@ object ReconciliationSampleData {
 			val targetRecords = List(
 				QueryRecord(
 					List(
-						QueryColumn("department", Some("Technology"), "java.lang.String"),
-						QueryColumn("transaction_date", Some("2021-06-10"), "java.sql.Date"),
-						QueryColumn("count", Some(10821), "java.lang.Integer"),
-						QueryColumn("sales", Some(15630330.46), "java.lang.Double")
+						QueryColumn("department", Some("Technology"), Some(QueryMetadataColumn(30, 20, 0, false, false))),
+						QueryColumn("transaction_date", Some("2021-06-10"), Some(QueryMetadataColumn(30, 20, 0, false, false))),
+						QueryColumn("count", Some(10821), Some(QueryMetadataColumn(30, 20, 0, false, false))),
+						QueryColumn("sales", Some(15630330.46), Some(QueryMetadataColumn(30, 20, 0, false, false)))
 					),
 					"Technology|2021-06-10"
 				),
 				QueryRecord(
 					List(
-						QueryColumn("department", Some("Fashion"), "java.lang.String"),
-						QueryColumn("transaction_date", Some("2021-06-10"), "java.sql.Date"),
-						QueryColumn("count", Some(47532), "java.lang.Integer"),
-						QueryColumn("sales", Some(37680362.15), "java.lang.Double")
+						QueryColumn("department", Some("Fashion"), Some(QueryMetadataColumn(30, 20, 0, false, false))),
+						QueryColumn("transaction_date", Some("2021-06-10"), Some(QueryMetadataColumn(30, 20, 0, false, false))),
+						QueryColumn("count", Some(47532), Some(QueryMetadataColumn(30, 20, 0, false, false))),
+						QueryColumn("sales", Some(37680362.15), Some(QueryMetadataColumn(30, 20, 0, false, false)))
 					),
 					"Fashion|2021-06-10"
 				)
@@ -485,25 +495,21 @@ object ReconciliationSampleData {
 				ReconciliationRecord(
 					queryKey,
 					List(
-						ReconcileKeyColumn("department", "Fashion"),
-						ReconcileKeyColumn("transaction_date", "2021-06-10"),
-					),
-					List(
-						StringLikeColumn("audit_date", Some(sampleAuditDate), None, isMatched = false),
-						NumberColumn[Double]("count", Some(47531.0), Some(47532.0), -1.0, -0.0021038901, isMatched = false),
-						NumberColumn[Double]("sales", Some(37680322.15), Some(37680362.15), -40.0, -0.0001061562, isMatched = false)
+						ReconciledColumn("audit_date" ,false, StringLikeColumn(Some(sampleAuditDate), None, isMatched = false), dummyAuditDateReconciledMetadata),
+						ReconciledColumn("count", false, NumberColumn[Double](Some(47531.0), Some(47532.0), -1.0, -0.0021038901, isMatched = false), dummyIntegerDateReconciledMetadata),
+						ReconciledColumn("department", true, StringLikeColumn(Some("Fashion"), Some("Fashion"), true), dummyStringDateReconciledMetadata),
+						ReconciledColumn("sales", false, NumberColumn[Double](Some(37680322.15), Some(37680362.15), -40.0, -0.0001061562, isMatched = false), dummyDoubleDateReconciledMetadata),
+						ReconciledColumn("transaction_date", true, StringLikeColumn(Some("2021-06-10"), Some("2021-06-10"), true), dummyStringDateReconciledMetadata)
 					)
 				),
 				ReconciliationRecord(
 					queryKey,
 					List(
-						ReconcileKeyColumn("department", "Technology"),
-						ReconcileKeyColumn("transaction_date", "2021-06-10"),
-					),
-					List(
-						StringLikeColumn("audit_date", Some(sampleAuditDate), None, isMatched = false),
-						NumberColumn[Double]("count", Some(10065.0), Some(10821.0), -756, -7.5111773472, isMatched = false),
-						NumberColumn[Double]("sales", Some(15630320.46), Some(15630330.46), -10.0, -0.0000639782, isMatched = false)
+						ReconciledColumn("audit_date" ,false, StringLikeColumn(Some(sampleAuditDate), None, isMatched = false), dummyAuditDateReconciledMetadata),
+						ReconciledColumn("count", false, NumberColumn[Double](Some(10065.0), Some(10821.0), -756, -7.5111773472, isMatched = false), dummyIntegerDateReconciledMetadata),
+						ReconciledColumn("department", true, StringLikeColumn(Some("Technology"), Some("Technology"), true), dummyStringDateReconciledMetadata),
+						ReconciledColumn("sales", false, NumberColumn[Double](Some(15630320.46), Some(15630330.46), -10.0, -0.0000639782, isMatched = false), dummyDoubleDateReconciledMetadata),
+						ReconciledColumn("transaction_date", true, StringLikeColumn(Some("2021-06-10"), Some("2021-06-10"), true), dummyStringDateReconciledMetadata)
 					)
 				)
 			)
@@ -513,5 +519,5 @@ object ReconciliationSampleData {
 	}
 
 	object EmptyResult {}
-	object TypedValue {}
+	object TypedAndMetadataValueInDetail {}
 }
