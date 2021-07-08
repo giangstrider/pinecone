@@ -11,9 +11,8 @@ import java.sql.Timestamp
 
 object RecordReconciliation {
 	def reconcile(source: Option[List[QueryRecord]], target: Option[List[QueryRecord]], query: PrepareQuery): List[ReconciliationRecord] = {
-		val reconcileKeyColumns = (v: List[QueryColumn]) => v.filter(c => query.reconcileKey.contains(c.columnName))
-									.map(qc => ReconcileKeyColumn(qc.columnName, qc.columnValue.get.toString))
-		val filterAndSort = (v: List[QueryColumn]) => v.filterNot(vc => query.reconcileKey.contains(vc.columnName)).sortBy(_.columnName)
+		val checkReconcileKey = (v: String) => query.reconcileKey.contains(v)
+		val sort = (v: List[QueryColumn]) => v.sortBy(_.columnName)
 
 		(source, target) match {
 			case (Some(s), Some(t)) =>
@@ -22,20 +21,33 @@ object RecordReconciliation {
 					val columnsS = pair.head.columns
 					val columnsT = pair.last.columns
 
-					val attributeS = filterAndSort(columnsS)
-					val attributesT = filterAndSort(columnsT)
+					val attributeS = sort(columnsS)
+					val attributesT = sort(columnsT)
 
-					val pairAttributes =  attributeS.map(sc => {
+					val pairAttributes = attributeS.map(sc => {
 						attributesT.find(c => sc.columnName == c.columnName) match {
-							case Some(tc) => convertToReconcileColumn(sc.columnName, sc.columnValue, tc.columnValue)
-							case None => convertToReconcileColumn(sc.columnName, sc.columnValue, None)
+							case Some(tc) =>
+								val value = convertToReconcileColumn(sc.columnValue, tc.columnValue)
+								val clazz = classReconcile(Some(sc.columnValue), Some(tc.columnValue))
+								val meta = Some(metadataReconcile(sc.metadata, tc.metadata, clazz))
+								val isReconcileKey = checkReconcileKey(sc.columnName)
+								ReconciledColumn(sc.columnName, isReconcileKey, value, meta)
+							case None =>
+								val value = convertToReconcileColumn(sc.columnValue, None)
+								val isReconcileKey = checkReconcileKey(sc.columnName)
+								ReconciledColumn(sc.columnName, isReconcileKey, value, None)
 						}
 					})
 
 					val missTargetAttributes = attributesT.filterNot(tm => attributeS.map(_.columnName)
-						.contains(tm.columnName)).map(tm => convertToReconcileColumn(tm.columnName, None, tm.columnValue))
+						.contains(tm.columnName)).map(tm => {
+						val value = convertToReconcileColumn(None, tm.columnValue)
+						val isReconcileKey = checkReconcileKey(tm.columnName)
+						ReconciledColumn(tm.columnName, isReconcileKey, value, None)
+					})
 
-					ReconciliationRecord(query.queryKey, reconcileKeyColumns(columnsS), pairAttributes ++ missTargetAttributes)
+					val reconcileTypedColumns = pairAttributes ++ missTargetAttributes
+					ReconciliationRecord(query.queryKey, reconcileTypedColumns)
 				}).toList
 
 				val missingPairKey = groupRecords.filter(_._2.size == 1).keySet
@@ -55,60 +67,72 @@ object RecordReconciliation {
 				matchedPair
 
 			case (Some(v), None) =>	v.map(qc => {
-					val columns = filterAndSort(qc.columns)
-					val pairAttributes = columns.map(c => {convertToReconcileColumn(c.columnName, c.columnValue, None)})
-					ReconciliationRecord(query.queryKey, reconcileKeyColumns(qc.columns), pairAttributes)
+					val columns = sort(qc.columns)
+					val pairAttributes = columns.map(c => {
+						val value = convertToReconcileColumn(c.columnValue, None)
+						val isReconcileKey = checkReconcileKey(c.columnName)
+						ReconciledColumn(c.columnName, isReconcileKey, value, None)
+					})
+					ReconciliationRecord(query.queryKey, pairAttributes)
 				})
 
 			case (None, Some(v)) =>	v.map(qc => {
-					val columns = filterAndSort(qc.columns)
-					val pairAttributes = columns.map(c => {convertToReconcileColumn(c.columnName, None, c.columnValue)})
-					ReconciliationRecord(query.queryKey, reconcileKeyColumns(qc.columns), pairAttributes)
+					val columns = sort(qc.columns)
+					val pairAttributes = columns.map(c => {
+						val value = convertToReconcileColumn(None, c.columnValue)
+						val isReconcileKey = checkReconcileKey(c.columnName)
+						ReconciledColumn(c.columnName, isReconcileKey, value, None)
+					})
+					ReconciliationRecord(query.queryKey, pairAttributes)
 				})
 		}
 	}
 
-	private def processMissingPair(records: List[QueryRecord], isTarget: Boolean, prepareQuery: PrepareQuery): List[ReconciliationRecord] = {
+	private def processMissingPair(records: List[QueryRecord], isTarget: Boolean, query: PrepareQuery): List[ReconciliationRecord] = {
 		records.map(qc => {
-			val columns = qc.columns
-			val attributes = columns.filterNot(c => prepareQuery.reconcileKey.contains(c.columnName))
-			val reconciliation = if (isTarget) attributes.map(c => convertToReconcileColumn(c.columnName, None, c.columnValue))
-								else attributes.map(c => convertToReconcileColumn(c.columnName, c.columnValue, None))
-			val reconcileKeyColumns = columns.filter(c => prepareQuery.reconcileKey.contains(c.columnName))
-								.map(qc => ReconcileKeyColumn(qc.columnName, qc.columnValue.get.toString))
-			ReconciliationRecord(prepareQuery.queryKey, reconcileKeyColumns, reconciliation)
+			val pairAttributes = if (isTarget) qc.columns.map(c => {
+				val value = convertToReconcileColumn(None, c.columnValue)
+				val isReconcileKey = query.reconcileKey.contains(c.columnName)
+				ReconciledColumn(c.columnName, isReconcileKey, value, None)
+			})
+			else qc.columns.map(c => {
+				val value = convertToReconcileColumn(c.columnValue, None)
+				val isReconcileKey = query.reconcileKey.contains(c.columnName)
+				ReconciledColumn(c.columnName, isReconcileKey, value, None)
+			})
+			ReconciliationRecord(query.queryKey, pairAttributes)
 		})
 	}
 
-	private def convertToReconcileColumn(columnName: String, source: Option[Any], target: Option[Any]): ReconcileTypedColumn = {
+	private def convertToReconcileColumn(source: Option[Any], target: Option[Any]): ReconcileTypedColumn = {
 		(source, target) match {
 			case (Some(sv), Some(tv)) => (sv, tv) match {
 				case v@((_: Short, _: Short) | (_: Int, _: Int) | (_: Long, _: Long) | (_: Double, _: Double)) =>
-					numericReconcile(columnName, Some(v._1.asInstanceOf[Number].doubleValue), Some(v
+					numericReconcile(Some(v._1.asInstanceOf[Number].doubleValue), Some(v
 						._2.asInstanceOf[Number].doubleValue))
 
 				case v@((_: BigInt, _: BigInt) | (_: BigDecimal, _: BigDecimal)) =>
-					numericReconcile(columnName, Some(v._1.asInstanceOf[BigDecimal]), Some(v._2.asInstanceOf[BigDecimal]))
+					numericReconcile(Some(v._1.asInstanceOf[BigDecimal]), Some(v._2.asInstanceOf[BigDecimal]))
 				case v@((_: Date, _: Date) | (_: Timestamp, _: Timestamp) | (_: String, _: String)) =>
-					stringLikeReconcile(columnName, Some(v._1), Some(v._2))
+					stringLikeReconcile(Some(v._1), Some(v._2))
 			}
 			case (Some(v), None) => v match {
-				case s@(_: Short | _: Int | _: Long | _: Double) => numericReconcile(columnName, Some(s
+				case s@(_: Short | _: Int | _: Long | _: Double) => numericReconcile(Some(s
 					.asInstanceOf[Number].doubleValue), None)
-				case s@(_: BigInt | _: BigDecimal) => numericReconcile(columnName, Some(s.asInstanceOf[BigDecimal]), None)
-				case s@(_: Date | _: Timestamp | _: String) => stringLikeReconcile(columnName, Some(s), None)
+				case s@(_: BigInt | _: BigDecimal) => numericReconcile(Some(s.asInstanceOf[BigDecimal]), None)
+				case s@(_: Date | _: Timestamp | _: String) => stringLikeReconcile(Some(s), None)
 			}
 			case (None, Some(v)) => v match {
-				case t@(_: Short | _: Int | _: Long | _: Double) => numericReconcile(columnName, None, Some(t
+				case t@(_: Short | _: Int | _: Long | _: Double) => numericReconcile(None, Some(t
 					.asInstanceOf[Number].doubleValue))
-				case t@(_: BigInt | _: BigDecimal) => numericReconcile(columnName, None, Some(t.asInstanceOf[BigDecimal]))
+				case t@(_: BigInt | _: BigDecimal) => numericReconcile(None, Some(t.asInstanceOf[BigDecimal]))
 				case t@(_: Date | _: Timestamp | _: String) =>
-					stringLikeReconcile(columnName, None, Some(t))
+					stringLikeReconcile(None, Some(t))
 			}
 		}
 	}
 
-	private def numericReconcile[N](columnName: String, source: Option[N], target: Option[N])(implicit n: Fractional[N]): NumberColumn[N] = {
+	private def numericReconcile[N](source: Option[N], target: Option[N])(implicit n: Fractional[N]): NumberColumn[N] = {
 		import n._
 		val valueToN = (value: Option[N]) => value match {
 			case Some(v) => if(toDouble(v) == 0) (v, true) else (v, false)
@@ -123,18 +147,63 @@ object RecordReconciliation {
 		val isMatched: Boolean = equiv(sourceN, targetN)
 
 		val actualV = (v: N, isZero: Boolean) => if(toDouble(v) == 0 && !isZero) None else Some(v)
-		NumberColumn(columnName, actualV(sourceN, isSZero), actualV(targetN, isTZero), different, deviation, isMatched)
+		NumberColumn(actualV(sourceN, isSZero), actualV(targetN, isTZero), different, deviation, isMatched)
 	}
 
-	private def stringLikeReconcile[S](columnName: String, source: Option[S], target: Option[S]): StringLikeColumn[S] = {
+	private def stringLikeReconcile[S](source: Option[S], target: Option[S]): StringLikeColumn[S] = {
 		val isMatched: Boolean = if(source == target) true else false
-		StringLikeColumn(columnName,source, target, isMatched)
+		StringLikeColumn(source, target, isMatched)
+	}
+
+	def metadataReconcile(source: Option[QueryMetadataColumn], target: Option[QueryMetadataColumn], clazzCheck: ReconciledMetadataRecord): ReconcileMetadataColumn = {
+		(source, target) match {
+			case (Some(sv), Some(tv)) =>
+				val checkDisplaySize = if(sv.displaySize == tv.displaySize) Convertible.Good else Convertible.Warning
+				val checkPrecision = if(sv.precision == tv.precision) Convertible.Good else Convertible.Alert
+				val checkScale = if(sv.scale == tv.scale) Convertible.Good else Convertible.Alert
+				val checkCurrency = if(sv.isCurrency == tv.isCurrency) Convertible.Good else Convertible.MinorWarning
+				val checkNullable = if(sv.isNullable == tv.isNullable) Convertible.Good else Convertible.Warning
+				ReconcileMetadataColumn(
+					clazzCheck,
+					ReconciledMetadataRecord(sv.displaySize, tv.displaySize, checkDisplaySize),
+					ReconciledMetadataRecord(sv.precision, tv.precision, checkPrecision),
+					ReconciledMetadataRecord(sv.scale, tv.scale, checkScale),
+					ReconciledMetadataRecord(sv.isCurrency, tv.isCurrency, checkCurrency),
+					ReconciledMetadataRecord(sv.isNullable, tv.isNullable, checkNullable)
+				)
+		}
+	}
+
+	def classReconcile(source: Any, target: Any): ReconciledMetadataRecord = {
+		if(source.getClass == target.getClass) return ReconciledMetadataRecord(source, target, Convertible.Good)
+
+		val checkNumeric = (v: Any) => v.isInstanceOf[Int] || v.isInstanceOf[Long] || v.isInstanceOf[Short]
+		val checkBigNumeric = (v: Any) => v.isInstanceOf[BigInt]
+		val checkDecimal = (v: Any) => v.isInstanceOf[Float] || v.isInstanceOf[Double]
+		val checkBigDecimal = (v: Any) => v.isInstanceOf[BigDecimal]
+
+		val reconcileConvertible = (s: Any, t: Any) => (s, t) match {
+			case  v@(_, _) if v._1.isInstanceOf[Number] && v._2.isInstanceOf[Number] =>
+				if(checkNumeric(v._1) == checkNumeric(v._2) || checkDecimal(v._1) == checkDecimal(v._2)) Convertible.MinorWarning
+				else if(checkNumeric(v._1) == checkBigNumeric(v._2) || checkDecimal(v._1) == checkBigDecimal(v._2)) Convertible.Warning
+				else Convertible.Alert
+			case _ => Convertible.Alert
+		}
+
+		val sourceCompareTarget = reconcileConvertible(source, target)
+		val targetCompareSource = reconcileConvertible(target, source)
+		val convertible = if (sourceCompareTarget == targetCompareSource || sourceCompareTarget > targetCompareSource)
+			sourceCompareTarget
+		else targetCompareSource
+		ReconciledMetadataRecord(source, target, convertible)
 	}
 
 	private def setScale(number: Double): Double = {
 		val decimalScale = pineconeConf.reconciliation.decimalScale
 		BigDecimal(number).setScale(decimalScale, BigDecimal.RoundingMode.HALF_EVEN).doubleValue
 	}
+
+
 
 	def validateQueryColumn = ???
 	//Reject column name appear more than one
