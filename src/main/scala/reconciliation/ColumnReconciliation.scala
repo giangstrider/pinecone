@@ -2,7 +2,7 @@ package reconciliation
 
 
 object ColumnReconciliation {
-	def classReconcile(columnName: String, source: Option[Any], target: Option[Any]): ReconcileClassColumn = {
+	def classReconcile(columnName: String, source: Option[Any], target: Option[Any]): ReconcileMetadataColumn = {
 		(source, target) match {
 			case (Some(sv), Some(tv)) =>
 				if(sv.getClass == tv.getClass)
