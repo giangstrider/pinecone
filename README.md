@@ -20,13 +20,79 @@ Please reach out to me on email strider.giang@live.com or Github issues.
 <br />
 
 # Main Features
-
+ 
 - Define your own reconciliation workflow basically including data source and data target with many options for reporting, monitoring, and alert notification.
 - Connect to multiple database connections via JDBC to execute your SQL queries.
 - SQL templating: using Pinecone's define variable to dynamically replace itself value at run time (such as \${yesterday}, ${last_6_months} ...)
+- Numeric reconciliation and String like reconciliation.
 - Rolling back your entire's workflow definition to any specific point of time.
+ 
+# Core Concepts
+The basic idea of Pinecone is the central place for executing a set of reconciliation queries against many data sources and compare them with your own definition and decide what to do with the compared result. This is called Reconciliation Workflow.
+ 
+It also has capability to configure your queries run back at any point of time, compare and generate the report around it. But again, this is based on the concept of Reconciliation Workflow.
+ 
+By utilizing JDBC, we can connect to almost any database available. Not only databases, it also means that we can also utilize the computing capacity of many query execution engines such as Trino or Spark.
+ 
+## What's Pinecone compare? How does the comparison work?
+ 
+### General comparison
+The comparison between the results of two SQL queries operate on a data equally check basis.
+Basically, Pinecone compares two tables (returned by SQL queries) and figures out the differences between them.
+ 
+But since data volume of many companies extremely large, it is recommended that you should avoid the concept of compare directly row by row - (even though Pinecone still support it)
+ 
+Famous example is
+```sql
+SELECT * FROM TABLE
+```
+ 
+Being said that, Pinecone is the tool that operates on your aggregated level of data metrics. For example, instead `SELECT *`, the way it should is
+ 
+```sql
+SELECT INSERT_DATE, COUNT(*) FROM TABLE GROUP BY INSERT_DATE
+--or
+SELECT COUNT(*) FROM TABLE
+```
+The metrics in this context is something already similar to any data professional such as `COUNT`, `SUM`, `MAX/MIN` ... which operate together with a `GROUP BY` statement. The goal of Pinecone is about to operate on a high level of data table, rather than go down row-by-row.
+ 
+### Reconcile key
+Consider this example:
+```sql
+SELECT DEPARTMENT, COUNT(*) FROM TABLE GROUP BY DEPARTMENT
+--or previous example
+SELECT INSERT_DATE, COUNT(*) FROM TABLE GROUP BY INSERT_DATE
+```
+ 
+`DEPARTMENT` and `INSERT_DATE` is a grouped column to do the `COUNT` function. As mentioned above, Pinecone operate on high level of data, concept of `Reconcile key` is to specify your grouped columns in order to:
+- Know which columns should be operate the [deviate reconciliation](#deviate-reconciliation).
+- Determine whether on the time when workflow is executed, the grouped columns are missing compared to other sources. This is also a key optimization internally where Pinecone compares a large volume of data.
+ 
+`Reconcile key` is an important concept which helps Pinecone operate efficiently.
+ 
+### Metadata check
+Not only data level, Pinecone is also able to check metadata for each column, and decide whether type of column is matched or not. Also rate the comparable level between columns of two systems in case it is not matched.
+ 
+### SQL Templating
+ 
+In order to reconcile effectively, Pinecone came up with the `SQL Templating` feature that can replace dynamically variables in your SQL queries at runtime.
+ 
+ 
+Imagine you want to set up periodically for a workflow running on time basis, you can define Pinecone's SQL syntax and Pine will do the job.
+ 
+An example you can think of is dynamically change value of `$PINECONE{MONTH(-1)}`:
+ 
+```sql
+SELECT TRANSACTION_DATE, COUNT(*) FROM TABLE WHERE MONTH(TRANSACTION_DATE) = $PINECONE{MONTH(-1)}
+--$PINECONE{MONTH(-1)} ON 15-06-2021 will be 5
+```
+ 
+As you may think, you can just use the database's function to do that. This is correct. But this feature aim to:
+- Unify syntax across the workflows. It may take time to explore syntax for each database and it also is hard to understand when you have too many syntax for the same utility. And when unified using Pinecone's feature, you can just make one change and apply for all of the workflows.
+- By unified syntax, Pinecone is also able to rolling all workflows to any point of time when your workflow is just over a hundred, it is pain to apply manually for each workflow.
 
-# Concept
+
+<br />
 
 # Table of Contents
 1. [Configuration](#configuration)
