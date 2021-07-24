@@ -86,7 +86,7 @@ As you can see in above example, data type on `AMOUNT` column high chance is `IN
 This could be major issues in term of data quality. Even though data in both table when you doing a `SUM` maybe the same. You can't know one day, a `DOUBLE` could be `5.5` meanwhile A not able to represent the precision.
 
 Another example in Snowflake database:
-```
+```sql
 -- Database A
 SELECT AMOUNT FROM TABLE -- Type of Amount: NUMBER(23, 10)
 -- Database B
@@ -94,7 +94,7 @@ SELECT AMOUNT FROM TABLE -- type of Amount: NUMBER(23, 5)
 ```
 This precision could be a potenial bug in future.
 
-By utilizing JDBC metadata featur, Pinecone add this capability to enhance data reconciliation process.
+By utilizing JDBC metadata feature, Pinecone add this capability to enhance data reconciliation process.
 ### SQL Templating
  
 In order to reconcile effectively, Pinecone came up with the `SQL Templating` feature that can replace dynamically variables in your SQL queries at runtime.
@@ -195,6 +195,11 @@ jdbc {
     }
  }
 ```
+
+### Snowflake Async support
+Snowflake's JDBC [support to perform an asynchronous query](https://docs.snowflake.com/en/user-guide/jdbc-using.html#performing-an-asynchronous-query). Pinecone using this ability to improve performance internally.
+
+You can turn off this on application's config. However, it is not recommended.
 
 <br />
 
