@@ -25,8 +25,6 @@ Please reach out to me on email strider.giang@live.com or Github issues.
 - Connect to multiple database connections via JDBC to execute your SQL queries.
 - SQL templating: using Pinecone's define variable to dynamically replace itself value at run time (such as \${yesterday}, ${last_6_months} ...)
 - Rolling back your entire's workflow definition to any specific point of time.
-<br />
-<br />
 
 # Concept
 
@@ -44,8 +42,6 @@ Please reach out to me on email strider.giang@live.com or Github issues.
     - Docker
     - CLI
 
-<br />
-<br />
 
 # Configuration
 This is the most important part in order to set up connections, workflows and other attributes. It also explain how the application works.
@@ -57,6 +53,7 @@ Many sections below come up with popular syntax which is used here.
 ## Database Connection
 
 Only support databases with supported JDBC drivers. Theoretically any databases which supported JDBC will be worked natively with Pinecone, since underlying Pinecone uses raw JDBC syntax support for JVM languages.
+
 Here is the list of supported databases which fully tested with Pinecone, some of them utilize extra feature from database's JDBC driver (noted beside it).
 
 - SQL Server
@@ -111,7 +108,10 @@ jdbc {
  }
 ```
 
+<br />
+
 ## Reconciliation workflow
+
 The basic workflow will include data source and target (data destination). Define your SQL query for each data connection, as well as many attributes such as accepted deviation, when Pinecone should send notification to data stakeholders regarding data mismatch, or define your own reporting template.
 
 Workflow defined under `queries.conf`.
@@ -127,7 +127,7 @@ queries = [
         target-name = nection-name
         target-query = {type = "text-base", sql-query = "sql-query-string"}
         reconcileKey = ["TradingDate"]
-        accepted-deviation = 6.8113
+        accepted-deviation = double-value
     }
 ```
 
@@ -135,7 +135,7 @@ queries = [
 |--------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | query-key          | Unique name across your workflows. Pinecone considers it as a "primary key" across application's logic. <br>If you come up with same workflow but run against different data sources, it is recommended that put the data source name along `query-key` it self.                                                                                                                                                                  |
 | source-name        | Your database connection name defined in [database connection section](#connection-syntax).<br>This attribute acts as a Data Source.                                                                                                                                                                                                                                                                                                                    |
-| source-query       | Your SQL string will be received here.<br>You can simply put for SQL String, or if it is too long and better to be a separate file (to utilize IDE's syntax highlighting for example), Pinecone also support it.<br><br>- For SQL String: \{type = "**text**-base", sql-**query** = "SELECT CURRENT_DATE - 1 AS OPERATION_DATE FROM COSTS GROUP BY OPERATION_DATE"}<br>- For SQL File: \{type = "**file**-base", sql-**file** = "/unix-path/file.sql"}                                                                                                                                                              |
+| source-query       | Your SQL string will be received here.<br>You can simply put for SQL String, or if it is too long and better to be a separate file (to utilize IDE's syntax highlighting for example), Pinecone also support it.<br><br>- For SQL String: `{type = "text-base", sql-query = "SELECT CURRENT_DATE - 1 AS OPERATION_DATE FROM COSTS GROUP BY OPERATION_DATE"}`<br>- For SQL File: `{type = "file-base", sql-file = "/unix-path/file.sql"}   `                                                                                                                                                           |
 | target-name        | Same with `source-name`. Except this acts as a Data Target.                                                                                                                                                                                                                                                                                                                                                                       |
 | target-query       | Same with `source-query`. Except this acts as a Data Target.                                                                                                                                                                                                                                                                                                                                                                      |
 | reconcile-key      | This attribute explained in details in SQL [requirement section](#sql-basic-requirement).<br><br>Define it as an "array" or "list" in other languages. Eg: ["INSERT_DATE", "USER_GROUP"]                                                                                                                                                                                                                                         |
