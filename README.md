@@ -72,7 +72,29 @@ SELECT INSERT_DATE, COUNT(*) FROM TABLE GROUP BY INSERT_DATE
  
 ### Metadata check
 Not only data level, Pinecone is also able to check metadata for each column, and decide whether type of column is matched or not. Also rate the comparable level between columns of two systems in case it is not matched.
- 
+
+```sql
+
+-- Database A
+SELECT AMOUNT FROM TABLE -- Return 5
+-- Database B
+SELECT AMOUNT FROM TABLE -- Return 5.0
+```
+
+As you can see in above example, data type on `AMOUNT` column high chance is `INT`, meanwhile B maybe a `DOUBLE`. 
+
+This could be major issues in term of data quality. Even though data in both table when you doing a `SUM` maybe the same. You can't know one day, a `DOUBLE` could be `5.5` meanwhile A not able to represent the precision.
+
+Another example in Snowflake database:
+```
+-- Database A
+SELECT AMOUNT FROM TABLE -- Type of Amount: NUMBER(23, 10)
+-- Database B
+SELECT AMOUNT FROM TABLE -- type of Amount: NUMBER(23, 5)
+```
+This precision could be a potenial bug in future.
+
+By utilizing JDBC metadata featur, Pinecone add this capability to enhance data reconciliation process.
 ### SQL Templating
  
 In order to reconcile effectively, Pinecone came up with the `SQL Templating` feature that can replace dynamically variables in your SQL queries at runtime.
