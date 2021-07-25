@@ -106,15 +106,14 @@ object RecordReconciliation {
 
 	private def convertToReconcileColumn(source: Option[Any], target: Option[Any]): ReconcileTypedColumn = {
 		(source, target) match {
-			case (Some(sv), Some(tv)) => (sv, tv) match {
-				case v@((_: Short, _: Short) | (_: Int, _: Int) | (_: Long, _: Long) | (_: Double, _: Double)) =>
-					numericReconcile(Some(v._1.asInstanceOf[Number].doubleValue), Some(v
-						._2.asInstanceOf[Number].doubleValue))
-
-				case v@((_: BigInt, _: BigInt) | (_: BigDecimal, _: BigDecimal)) =>
-					numericReconcile(Some(v._1.asInstanceOf[BigDecimal]), Some(v._2.asInstanceOf[BigDecimal]))
-				case v@((_: Date, _: Date) | (_: Timestamp, _: Timestamp) | (_: String, _: String)) =>
-					stringLikeReconcile(Some(v._1), Some(v._2))
+			case (Some(sv), Some(tv)) =>
+				(sv, tv) match {
+				case v@(_:Short | _:Int | _:Long | _:Float | _:Double, _:Short | _:Int | _:Long | _:Float | _:Double) =>
+					numericReconcile(Some(v._1.asInstanceOf[Number].doubleValue), Some(v._2.asInstanceOf[Number].doubleValue))
+				case v@(_:java.math.BigInteger | _:java.math.BigDecimal, _:java.math.BigInteger | _:java.math.BigDecimal) =>
+					val conversion = (vb: Any) => BigDecimal(vb.asInstanceOf[java.math.BigDecimal])
+					numericReconcile(Some(conversion(v._1)), Some(conversion(v._2)))
+				case _ => stringLikeReconcile(Some(sv), Some(tv))
 			}
 			case (Some(v), None) => v match {
 				case s@(_: Short | _: Int | _: Long | _: Double) => numericReconcile(Some(s
