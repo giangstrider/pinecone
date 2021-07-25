@@ -11,12 +11,15 @@ Pinecone aims to solve the problem by basic idea that form up SQL queries run ag
 <br />
 <br />
 
-# Note
+# Note - Work in progress
 
 This project developed internally. I'm rewriting it in a general approach to release as an open source project.
-To be released soon.
+
+Checkout [LISENCE](https://github.com/giangstrider/pinecone/blob/master/LICENSE)
+
 All contributions are more than welcome.
-Please reach out to me on email strider.giang@live.com or Github issues.  
+Please reach out to me on email strider.giang@live.com or Github issues.
+
 <br />
 
 # Main Features
@@ -26,6 +29,9 @@ Please reach out to me on email strider.giang@live.com or Github issues.
 - SQL templating: using Pinecone's define variable to dynamically replace itself value at run time (such as \${yesterday}, ${last_6_months} ...)
 - Numeric reconciliation and String like reconciliation.
 - Rolling back your entire's workflow definition to any specific point of time.
+
+**Note**: The intention going forward enable user to interact with Pinecone through the Dashboard, rather via CLI approach currently. If you want to contribute to building a Dashboard, let me know.
+ 
  
 # Core Concepts
 The basic idea of Pinecone is the central place for executing a set of reconciliation queries against many data sources and compare them with your own definition and decide what to do with the compared result. This is called Reconciliation Workflow.
@@ -114,8 +120,6 @@ As you may think, you can just use the database's function to do that. This is c
 - By unified syntax, Pinecone is also able to rolling all workflows to any point of time when your workflow is just over a hundred, it is pain to apply manually for each workflow.
 
 
-<br />
-
 # Table of Contents
 1. [Configuration](#configuration)
 - [Database connection](#database-connection)
@@ -197,7 +201,9 @@ jdbc {
 ```
 
 ### Snowflake Async support
-Snowflake's JDBC [support to perform an asynchronous query](https://docs.snowflake.com/en/user-guide/jdbc-using.html#performing-an-asynchronous-query). Pinecone using this ability to improve performance internally.
+Snowflake's JDBC [support to perform an asynchronous query](https://docs.snowflake.com/en/user-guide/jdbc-using.html#performing-an-asynchronous-query). 
+
+Since Pinecone's workflow Pinecone essentially is a network bound task, push down to database's provider will enhance performance.
 
 You can turn off this on application's config. However, it is not recommended.
 
