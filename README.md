@@ -71,7 +71,8 @@ SELECT INSERT_DATE, COUNT(*) FROM TABLE GROUP BY INSERT_DATE
 ```
  
 `DEPARTMENT` and `INSERT_DATE` is a grouped column to do the `COUNT` function. As mentioned above, Pinecone operate on high level of data, concept of `Reconcile key` is to specify your grouped columns in order to:
-- Know which columns should be operate the [deviate reconciliation](#deviate-reconciliation).
+- Tagging re-try workflow which not meet expected deviation base on Reconcile key to point what's data need to be reconciled again.
+- Knowing which columns should be operate the [deviate reconciliation](#deviate-reconciliation).
 - Determine whether on the time when workflow is executed, the grouped columns are missing compared to other sources. This is also a key optimization internally where Pinecone compares a large volume of data.
  
 `Reconcile key` is an important concept which helps Pinecone operate efficiently.
