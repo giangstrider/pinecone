@@ -8,10 +8,12 @@ import com.zaxxer.hikari.{HikariConfig, HikariDataSource}
 import anorm.{BatchSql, NamedParameter, RowParser, SQL, ToParameterList}
 import configuration.Pinecone.connectionConf
 import exception.PineconeExceptionHandler.exceptionStop
+import reconciliation.QueryStage.{ExecutedQuery, ExecutionQuery}
+
 import scala.util.{Failure, Success, Try}
 
 
-abstract class GeneralConnection(val config: Map[String, String]) {
+abstract class GeneralConnection(val config: Map[String, String]) extends PineconeExecutionUtility {
 	protected implicit val connection: Connection = getConnection
 
 	protected def getDriver: String
@@ -69,6 +71,12 @@ abstract class GeneralConnection(val config: Map[String, String]) {
 		val placeholderQuery = s"UPDATE $tableName SET $updatingColumns WHERE $compositeKeyColumns"
 		Try(BatchSql(placeholderQuery, dataParams.head, dataParams.tail:_*).execute)
 	}
+
+	def executePineconeQuery(query: ExecutionQuery): ExecutedQuery = {
+		getQueryResult(getResultSet(query.query), query)
+	}
+
+	def closeConnection() = connection.close
 }
 
 object GeneralConnection {
@@ -79,15 +87,24 @@ object GeneralConnection {
 			case Some(jdbcConnection) => jdbcConnection
 			case None =>
 				val connectionDetail = getConnectionDetail(connectionName)
-				val databaseName = connectionDetail("jdbcUrl").split(":")(1)
-				val connectionJdbc = databaseName match {
-					case "snowflake" => new SnowflakeConnection(connectionDetail)
-					case _ => new SimpleConnection(connectionDetail)
-				}
+				val connectionJdbc = new SimpleConnection(connectionDetail)
 				connectionDictionary += (connectionName -> connectionJdbc)
 				connectionJdbc
 		}
 	}
+
+	def getSnowflakeConnection(connectionName: String): SnowflakeConnection = {
+		connectionDictionary.get(connectionName) match {
+			case Some(jdbcConnection) => jdbcConnection.asInstanceOf[SnowflakeConnection]
+			case None =>
+				val connectionDetail = getConnectionDetail(connectionName)
+				val connectionJdbc = new SnowflakeConnection(connectionDetail)
+				connectionDictionary += (connectionName -> connectionJdbc)
+				connectionJdbc
+		}
+	}
+
+	def getDatabaseType(connectionName: String): String = getConnectionDetail(connectionName)("jdbcUrl").split(":")(1)
 
 	private def getConnectionDetail(connectionName: String): Map[String, String] = {
 		connectionConf.getOrElse(connectionName,
