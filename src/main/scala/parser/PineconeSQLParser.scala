@@ -16,7 +16,7 @@ class PineconeSQLParser extends RegexParsers {
 	def betweenOperator: Parser[String] = "BETWEEN"
 	def operatorOpen: Parser[String] = singleOperator | betweenOperator
 
-	def dateFunction: Parser[String] = "GET_DATE" | "GET_TIMESTAMP"
+	def dateFunction: Parser[String] = "PAST_DATE" | "GET_TIMESTAMP"
 	def dateOffsetParameter = dateFunction ~ "(" ~ number ~ ")" ^^ {
 		case dateFunc ~ openBracket ~ offsetParam ~ closeBracket =>
 			if(dateFunc.contains("DATE")) getDateObject(offsetParam) else getTimestampObject(offsetParam)
@@ -27,10 +27,13 @@ class PineconeSQLParser extends RegexParsers {
 	def dateFunctionWithParam = dateOffsetParameter | dateDefaultOffsetParameter
 	def dateParam = dateFunctionWithParam | fixedDateParameter
 
-
-	def singleStatement = singleOperator ~ dateParam ^^ {
-		case operator ~ param => s"${operator} ${param}"
+	def extractDateFunction: Parser[String] = "YEAR" | "MONTH" | "DAY"
+	def extractDateParam = extractDateFunction ~ "(" ~ dateParam ~ ")" ^^ {
+		case extractDateFunc ~ openBracket ~ dateParam ~ closeBracket =>
+			getExtractedTimeFromDate(extractDateFunc, dateParam)
 	}
+
+	def singleStatement = dateParam | extractDateParam ^^ (param => param)
 	def betweenStatement = betweenOperator ~ "(" ~ dateParam ~ "," ~ dateParam ~ ")" ^^ {
 		case operator ~ openBracket ~ startParam ~ comma ~ endParam ~ closeBracket =>
 			s"BETWEEN $startParam AND $endParam"

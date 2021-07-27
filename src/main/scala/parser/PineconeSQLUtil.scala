@@ -21,4 +21,15 @@ object PineconeSQLUtil {
 		val formatter = DateTimeFormatter.ofPattern(dateTimeFormat)
 		localDateTime.format(formatter)
 	}
+
+	def getExtractedTimeFromDate(func: String, date: String): String = {
+		val pattern = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+		val localDate = LocalDate.parse(date, pattern)
+		val result = func match {
+			case "YEAR" => localDate.getYear
+			case "MONTH" => localDate.getMonthValue
+			case "DAY" => localDate.getDayOfYear
+		}
+		result.toString
+	}
 }
