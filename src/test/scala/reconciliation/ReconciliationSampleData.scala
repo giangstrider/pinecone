@@ -113,9 +113,9 @@ object ReconciliationSampleData {
 					queryKey,
 					List(
 						ReconciledColumn("audit_date", false, StringLikeColumn(Some(sampleAuditDate), Some(sampleAuditDate), isMatched = true), dummyAuditDateReconciledMetadata),
-						ReconciledColumn("count", false, NumberColumn[Double](Some(47532.0), Some(47531.0), 1.0, 0.0021038458, isMatched = false), dummyIntegerDateReconciledMetadata),
+						ReconciledColumn("count", false, NumberColumn[Double](Some(47532.0), Some(47531.0), 1.0, 0.0021038458, true, isMatched = false), dummyIntegerDateReconciledMetadata),
 						ReconciledColumn("department", true, StringLikeColumn(Some("Fashion"), Some("Fashion"), true), dummyStringDateReconciledMetadata),
-						ReconciledColumn("sales", false, NumberColumn[Double](Some(37680362.15), Some(37680322.15), 40.0, 0.0001061561, isMatched = false), dummyDoubleDateReconciledMetadata),
+						ReconciledColumn("sales", false, NumberColumn[Double](Some(37680362.15), Some(37680322.15), 40.0, 0.0001061561, true, isMatched = false), dummyDoubleDateReconciledMetadata),
 						ReconciledColumn("store_name", false, StringLikeColumn(Some("Pinecone"), Some("Pinecone"), isMatched = true), dummyStringDateReconciledMetadata),
 						ReconciledColumn("transaction_date", true, StringLikeColumn(Some("2021-06-10"), Some("2021-06-10"), true), dummyStringDateReconciledMetadata),
 					)
@@ -124,9 +124,9 @@ object ReconciliationSampleData {
 					queryKey,
 					List(
 						ReconciledColumn("audit_date" ,false, StringLikeColumn(Some(sampleAuditDate), Some(sampleAuditDate), isMatched = true), dummyAuditDateReconciledMetadata),
-						ReconciledColumn("count" ,false, NumberColumn[Double](Some(10821.0), Some(10065.0), 756, 6.9864153036, isMatched = false), dummyIntegerDateReconciledMetadata),
+						ReconciledColumn("count" ,false, NumberColumn[Double](Some(10821.0), Some(10065.0), 756, 6.9864153036, false, isMatched = false), dummyIntegerDateReconciledMetadata),
 						ReconciledColumn("department", true, StringLikeColumn(Some("Technology"), Some("Technology"), true), dummyStringDateReconciledMetadata),
-						ReconciledColumn("sales" ,false, NumberColumn[Double](Some(15630330.46), Some(15630320.46), 10.0, 0.0000639782, isMatched = false), dummyDoubleDateReconciledMetadata),
+						ReconciledColumn("sales" ,false, NumberColumn[Double](Some(15630330.46), Some(15630320.46), 10.0, 0.0000639782, true, isMatched = false), dummyDoubleDateReconciledMetadata),
 						ReconciledColumn("store_name", false, StringLikeColumn(Some("Pinecone"), Some("Pinecone"), isMatched = true), dummyStringDateReconciledMetadata),
 						ReconciledColumn("transaction_date", true, StringLikeColumn(Some("2021-06-10"), Some("2021-06-10"), true), dummyStringDateReconciledMetadata))
 					)
@@ -191,18 +191,18 @@ object ReconciliationSampleData {
 				ReconciliationRecord(
 					queryKey,
 					List(
-						ReconciledColumn("count" ,false, NumberColumn[Double](Some(47531.0), Some(47532.0), -1.0, -0.0021038901, isMatched = false), dummyIntegerDateReconciledMetadata),
+						ReconciledColumn("count" ,false, NumberColumn[Double](Some(47531.0), Some(47532.0), -1.0, -0.0021038901, true, isMatched = false), dummyIntegerDateReconciledMetadata),
 						ReconciledColumn("department", true, StringLikeColumn(Some("Fashion"), Some("Fashion"), true), dummyStringDateReconciledMetadata),
-						ReconciledColumn("sales" ,false, NumberColumn[Double](Some(37680322.15), Some(37680362.15), -40.0, -0.0001061562, isMatched = false), dummyDoubleDateReconciledMetadata),
+						ReconciledColumn("sales" ,false, NumberColumn[Double](Some(37680322.15), Some(37680362.15), -40.0, -0.0001061562, true, isMatched = false), dummyDoubleDateReconciledMetadata),
 						ReconciledColumn("transaction_date", true, StringLikeColumn(Some("2021-06-10"), Some("2021-06-10"), true), dummyStringDateReconciledMetadata)
 					)
 				),
 				ReconciliationRecord(
 					queryKey,
 					List(
-						ReconciledColumn("count" ,false, NumberColumn[Double](Some(10065.0), Some(10821.0), -756, -7.5111773472, isMatched = false), dummyIntegerDateReconciledMetadata),
+						ReconciledColumn("count" ,false, NumberColumn[Double](Some(10065.0), Some(10821.0), -756, -7.5111773472, false, isMatched = false), dummyIntegerDateReconciledMetadata),
 						ReconciledColumn("department", true, StringLikeColumn(Some("Technology"), Some("Technology"), true), dummyStringDateReconciledMetadata),
-						ReconciledColumn("sales" ,false, NumberColumn[Double](Some(15630320.46), Some(15630330.46), -10.0, -0.0000639782, isMatched = false), dummyDoubleDateReconciledMetadata),
+						ReconciledColumn("sales" ,false, NumberColumn[Double](Some(15630320.46), Some(15630330.46), -10.0, -0.0000639782, true, isMatched = false), dummyDoubleDateReconciledMetadata),
 						ReconciledColumn("transaction_date", true, StringLikeColumn(Some("2021-06-10"), Some("2021-06-10"), true), dummyStringDateReconciledMetadata)
 					)
 				)
@@ -258,9 +258,9 @@ object ReconciliationSampleData {
 				ReconciliationRecord(
 					queryKey,
 					List(
-						ReconciledColumn("count", false, NumberColumn[Double](Some(10821.0), Some(10821.0), 0.0, 0.0, isMatched = true), dummyIntegerDateReconciledMetadata),
+						ReconciledColumn("count", false, NumberColumn[Double](Some(10821.0), Some(10821.0), 0.0, 0.0, true, isMatched = true), dummyIntegerDateReconciledMetadata),
 						ReconciledColumn("department", true, StringLikeColumn(Some("Technology"), Some("Technology"), true), dummyStringDateReconciledMetadata),
-						ReconciledColumn("sales" ,false, NumberColumn[Double](Some(15630330.46), Some(15630330.46), 0.0, 0.0, isMatched = true), dummyDoubleDateReconciledMetadata),
+						ReconciledColumn("sales" ,false, NumberColumn[Double](Some(15630330.46), Some(15630330.46), 0.0, 0.0, true, isMatched = true), dummyDoubleDateReconciledMetadata),
 						ReconciledColumn("transaction_date", true, StringLikeColumn(Some("2021-06-10"), Some("2021-06-10"), true), dummyStringDateReconciledMetadata)
 					)
 				),
@@ -269,8 +269,8 @@ object ReconciliationSampleData {
 					List(
 						ReconciledColumn("department", true, StringLikeColumn(Some("Technology"), None, false), None),
 						ReconciledColumn("transaction_date", true, StringLikeColumn(Some("2021-06-11"), None, false), None),
-						ReconciledColumn("count", false, NumberColumn[Double](Some(10409.0), None, 10409.0, 100.0, isMatched = false), None),
-						ReconciledColumn("sales" ,false, NumberColumn[Double](Some(14630732.52), None, 14630732.52, 100.0, isMatched = false), None)
+						ReconciledColumn("count", false, NumberColumn[Double](Some(10409.0), None, 10409.0, 100.0, false, isMatched = false), None),
+						ReconciledColumn("sales" ,false, NumberColumn[Double](Some(14630732.52), None, 14630732.52, 100.0, false, isMatched = false), None)
 					)
 				)
 			)
@@ -328,8 +328,8 @@ object ReconciliationSampleData {
 
 						ReconciledColumn("department", true, StringLikeColumn(Some("Technology"), None, false), None),
 						ReconciledColumn("transaction_date", true, StringLikeColumn(Some("2021-06-10"), None, false), None),
-						ReconciledColumn("count", false, NumberColumn[Double](Some(10821.0), None, 10821.0, 100.0, isMatched = false), None),
-						ReconciledColumn("sales" ,false, NumberColumn[Double](Some(15630330.46), None, 15630330.46, 100.0, isMatched = false), None)
+						ReconciledColumn("count", false, NumberColumn[Double](Some(10821.0), None, 10821.0, 100.0, false, isMatched = false), None),
+						ReconciledColumn("sales" ,false, NumberColumn[Double](Some(15630330.46), None, 15630330.46, 100.0, false, isMatched = false), None)
 					)
 				),
 				ReconciliationRecord(
@@ -337,8 +337,8 @@ object ReconciliationSampleData {
 					List(
 						ReconciledColumn("department", true, StringLikeColumn(Some("Technology"), None, false), None),
 						ReconciledColumn("transaction_date", true, StringLikeColumn(Some("2021-06-11"), None, false), None),
-						ReconciledColumn("count", false, NumberColumn[Double](Some(10409.0), None, 10409.0, 100.0, isMatched = false), None),
-						ReconciledColumn("sales", false, NumberColumn[Double](Some(14630732.52), None, 14630732.52, 100.0, isMatched = false), None)
+						ReconciledColumn("count", false, NumberColumn[Double](Some(10409.0), None, 10409.0, 100.0, false, isMatched = false), None),
+						ReconciledColumn("sales", false, NumberColumn[Double](Some(14630732.52), None, 14630732.52, 100.0, false, isMatched = false), None)
 					)
 				),
 				ReconciliationRecord(
@@ -346,8 +346,8 @@ object ReconciliationSampleData {
 					List(
 						ReconciledColumn("department", true, StringLikeColumn(None, Some("Fashion"), false), None),
 						ReconciledColumn("transaction_date", true, StringLikeColumn(None, Some("2021-06-10"), false), None),
-						ReconciledColumn("count", false, NumberColumn[Double](None, Some(10821.0), -10821.0, -100.0, isMatched = false), None),
-						ReconciledColumn("sales", false, NumberColumn[Double](None, Some(15630330.46), -15630330.46, -100.0, isMatched = false), None)
+						ReconciledColumn("count", false, NumberColumn[Double](None, Some(10821.0), -10821.0, -100.0, false, isMatched = false), None),
+						ReconciledColumn("sales", false, NumberColumn[Double](None, Some(15630330.46), -15630330.46, -100.0, false, isMatched = false), None)
 					)
 				)
 			)
@@ -415,9 +415,9 @@ object ReconciliationSampleData {
 				ReconciliationRecord(
 					queryKey,
 					List(
-						ReconciledColumn("count", false, NumberColumn[Double](Some(47531.0), Some(47532.0), -1.0, -0.0021038901, isMatched = false), dummyIntegerDateReconciledMetadata),
+						ReconciledColumn("count", false, NumberColumn[Double](Some(47531.0), Some(47532.0), -1.0, -0.0021038901, true, isMatched = false), dummyIntegerDateReconciledMetadata),
 						ReconciledColumn("department", true, StringLikeColumn(Some("Fashion"), Some("Fashion"), true), dummyStringDateReconciledMetadata),
-						ReconciledColumn("sales", false, NumberColumn[Double](Some(37680322.15), Some(37680362.15), -40.0, -0.0001061562, isMatched = false), dummyDoubleDateReconciledMetadata),
+						ReconciledColumn("sales", false, NumberColumn[Double](Some(37680322.15), Some(37680362.15), -40.0, -0.0001061562, true, isMatched = false), dummyDoubleDateReconciledMetadata),
 						ReconciledColumn("transaction_date", true, StringLikeColumn(Some("2021-06-10"), Some("2021-06-10"), true), dummyStringDateReconciledMetadata),
 						ReconciledColumn("audit_date" ,false, StringLikeColumn(None, Some(sampleAuditDate), isMatched = false), None),
 					)
@@ -425,9 +425,9 @@ object ReconciliationSampleData {
 				ReconciliationRecord(
 					queryKey,
 					List(
-						ReconciledColumn("count", false, NumberColumn[Double](Some(10065.0), Some(10821.0), -756, -7.5111773472, isMatched = false), dummyIntegerDateReconciledMetadata),
+						ReconciledColumn("count", false, NumberColumn[Double](Some(10065.0), Some(10821.0), -756, -7.5111773472, false, isMatched = false), dummyIntegerDateReconciledMetadata),
 						ReconciledColumn("department", true, StringLikeColumn(Some("Technology"), Some("Technology"), true), dummyStringDateReconciledMetadata),
-						ReconciledColumn("sales", false, NumberColumn[Double](Some(15630320.46), Some(15630330.46), -10.0, -0.0000639782, isMatched = false), dummyDoubleDateReconciledMetadata),
+						ReconciledColumn("sales", false, NumberColumn[Double](Some(15630320.46), Some(15630330.46), -10.0, -0.0000639782, true, isMatched = false), dummyDoubleDateReconciledMetadata),
 						ReconciledColumn("transaction_date", true, StringLikeColumn(Some("2021-06-10"), Some("2021-06-10"), true), dummyStringDateReconciledMetadata),
 						ReconciledColumn("audit_date" ,false, StringLikeColumn(None, Some(sampleAuditDate), isMatched = false), None)
 					)
@@ -497,9 +497,9 @@ object ReconciliationSampleData {
 					queryKey,
 					List(
 						ReconciledColumn("audit_date" ,false, StringLikeColumn(Some(sampleAuditDate), None, isMatched = false), None),
-						ReconciledColumn("count", false, NumberColumn[Double](Some(47531.0), Some(47532.0), -1.0, -0.0021038901, isMatched = false), dummyIntegerDateReconciledMetadata),
+						ReconciledColumn("count", false, NumberColumn[Double](Some(47531.0), Some(47532.0), -1.0, -0.0021038901, true, isMatched = false), dummyIntegerDateReconciledMetadata),
 						ReconciledColumn("department", true, StringLikeColumn(Some("Fashion"), Some("Fashion"), true), dummyStringDateReconciledMetadata),
-						ReconciledColumn("sales", false, NumberColumn[Double](Some(37680322.15), Some(37680362.15), -40.0, -0.0001061562, isMatched = false), dummyDoubleDateReconciledMetadata),
+						ReconciledColumn("sales", false, NumberColumn[Double](Some(37680322.15), Some(37680362.15), -40.0, -0.0001061562, true, isMatched = false), dummyDoubleDateReconciledMetadata),
 						ReconciledColumn("transaction_date", true, StringLikeColumn(Some("2021-06-10"), Some("2021-06-10"), true), dummyStringDateReconciledMetadata)
 					)
 				),
@@ -507,9 +507,9 @@ object ReconciliationSampleData {
 					queryKey,
 					List(
 						ReconciledColumn("audit_date" ,false, StringLikeColumn(Some(sampleAuditDate), None, isMatched = false), None),
-						ReconciledColumn("count", false, NumberColumn[Double](Some(10065.0), Some(10821.0), -756, -7.5111773472, isMatched = false), dummyIntegerDateReconciledMetadata),
+						ReconciledColumn("count", false, NumberColumn[Double](Some(10065.0), Some(10821.0), -756, -7.5111773472, false, isMatched = false), dummyIntegerDateReconciledMetadata),
 						ReconciledColumn("department", true, StringLikeColumn(Some("Technology"), Some("Technology"), true), dummyStringDateReconciledMetadata),
-						ReconciledColumn("sales", false, NumberColumn[Double](Some(15630320.46), Some(15630330.46), -10.0, -0.0000639782, isMatched = false), dummyDoubleDateReconciledMetadata),
+						ReconciledColumn("sales", false, NumberColumn[Double](Some(15630320.46), Some(15630330.46), -10.0, -0.0000639782, true, isMatched = false), dummyDoubleDateReconciledMetadata),
 						ReconciledColumn("transaction_date", true, StringLikeColumn(Some("2021-06-10"), Some("2021-06-10"), true), dummyStringDateReconciledMetadata)
 					)
 				)
@@ -521,4 +521,5 @@ object ReconciliationSampleData {
 
 	object EmptyResult {}
 	object TypedAndMetadataValueInDetail {}
+	object TypeMismatchForPairColumn {}
 }

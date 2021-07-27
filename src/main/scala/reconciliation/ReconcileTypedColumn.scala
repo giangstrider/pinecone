@@ -6,7 +6,7 @@ sealed trait ReconcileTypedColumn {
 
 object ReconcileTypedColumn {
 	case class NumberColumn[N](source: Option[N], target: Option[N], different: N,
-	                           deviation: Double,
+	                           deviation: Double, isMetAcceptedDeviation: Boolean,
 	                        isMatched: Boolean) extends ReconcileTypedColumn
 	case class StringLikeColumn[S](source: Option[S], target: Option[S],
 	                              isMatched: Boolean)
@@ -14,8 +14,8 @@ object ReconcileTypedColumn {
 		ReconcileTypedColumn
 
 	def apply[N](source: Option[N], target: Option[N], different: N, deviation: Double,
-	          isMatched: Boolean) =
-		NumberColumn(source, target, different, deviation, isMatched)
+	          isMetAcceptedDeviation: Boolean, isMatched: Boolean) =
+		NumberColumn(source, target, different, deviation, isMetAcceptedDeviation, isMatched)
 
 	def apply[S](source: Option[S], target: Option[S], isMatched: Boolean) =
 		StringLikeColumn(source, target, isMatched)

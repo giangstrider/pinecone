@@ -13,6 +13,7 @@ object RecordReconciliation {
 	def reconcile(source: Option[List[QueryRecord]], target: Option[List[QueryRecord]], query: PrepareQuery): List[ReconciliationRecord] = {
 		val checkReconcileKey = (v: String) => query.reconcileKey.contains(v)
 		val sort = (v: List[QueryColumn]) => v.sortBy(_.columnName)
+		implicit val acceptedDeviation: Double = query.acceptedDeviation
 
 		(source, target) match {
 			case (Some(s), Some(t)) =>
@@ -88,7 +89,7 @@ object RecordReconciliation {
 		}
 	}
 
-	private def processMissingPair(records: List[QueryRecord], isTarget: Boolean, query: PrepareQuery): List[ReconciliationRecord] = {
+	private def processMissingPair(records: List[QueryRecord], isTarget: Boolean, query: PrepareQuery)(implicit acceptedDeviation: Double): List[ReconciliationRecord] = {
 		records.map(qc => {
 			val pairAttributes = if (isTarget) qc.columns.map(c => {
 				val value = convertToReconcileColumn(None, c.columnValue)
@@ -104,7 +105,7 @@ object RecordReconciliation {
 		})
 	}
 
-	private def convertToReconcileColumn(source: Option[Any], target: Option[Any]): ReconcileTypedColumn = {
+	private def convertToReconcileColumn(source: Option[Any], target: Option[Any])(implicit acceptedDeviation: Double): ReconcileTypedColumn = {
 		val javaToScalaConversion = (vb: Any) => BigDecimal(vb.asInstanceOf[java.math.BigDecimal])
 
 		(source, target) match {
@@ -133,7 +134,7 @@ object RecordReconciliation {
 		}
 	}
 
-	private def numericReconcile[N](source: Option[N], target: Option[N])(implicit n: Fractional[N]): NumberColumn[N] = {
+	private def numericReconcile[N](source: Option[N], target: Option[N])(implicit n: Fractional[N], acceptedDeviation: Double): NumberColumn[N] = {
 		import n._
 		val valueToN = (value: Option[N]) => value match {
 			case Some(v) => if(toDouble(v) == 0) (v, true) else (v, false)
@@ -148,7 +149,8 @@ object RecordReconciliation {
 		val isMatched: Boolean = equiv(sourceN, targetN)
 
 		val actualV = (v: N, isZero: Boolean) => if(toDouble(v) == 0 && !isZero) None else Some(v)
-		NumberColumn(actualV(sourceN, isSZero), actualV(targetN, isTZero), different, deviation, isMatched)
+		val isMetAcceptedDeviation: Boolean = deviation.abs <= acceptedDeviation
+		NumberColumn(actualV(sourceN, isSZero), actualV(targetN, isTZero), different, deviation, isMetAcceptedDeviation, isMatched)
 	}
 
 	private def stringLikeReconcile[S](source: Option[S], target: Option[S]): StringLikeColumn[S] = {
