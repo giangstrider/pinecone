@@ -76,7 +76,7 @@ abstract class GeneralConnection(val config: Map[String, String]) extends Pineco
 		getQueryResult(getResultSet(query.query), query)
 	}
 
-	def closeConnection() = connection.close
+	def closeConnection(): Unit = connection.close
 }
 
 object GeneralConnection {

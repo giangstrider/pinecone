@@ -16,9 +16,9 @@ trait PineconeExecutionUtility {
 		val metadata = resultSet.getMetaData
 		val result = Iterator.from(0).takeWhile(_ => resultSet.next).map(_ => {
 			val columns = (for {i <- 1 to metadata.getColumnCount} yield {
-				QueryColumn(metadata.getColumnName(i),
+				QueryColumn(metadata.getColumnName(i).toUpperCase,
 					Some(resultSet.getObject(i)),
-					getQueryMetadata(metadata, i)
+					Some(getQueryMetadata(metadata, i))
 				)
 			}).toList
 			val key = columns.filter(c => executionQuery.reconcileKey.contains(c.columnName)).mkString("|")
