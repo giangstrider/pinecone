@@ -7,12 +7,12 @@ import java.sql.{Connection, ResultSet, ResultSetMetaData}
 
 
 trait PineconeExecutionUtility {
-	def getResultSet(query: String)(implicit connection : Connection): ResultSet = {
+	protected def getResultSet(query: String)(implicit connection : Connection): ResultSet = {
 		val statement = connection.createStatement
 		statement.executeQuery(query)
 	}
 
-	def getQueryResult(resultSet: ResultSet, executionQuery: ExecutionQuery): ExecutedQuery = {
+	protected def getQueryResult(resultSet: ResultSet, executionQuery: ExecutionQuery): ExecutedQuery = {
 		val metadata = resultSet.getMetaData
 		val result = Iterator.from(0).takeWhile(_ => resultSet.next).map(_ => {
 			val columns = (for {i <- 1 to metadata.getColumnCount} yield {
@@ -29,7 +29,7 @@ trait PineconeExecutionUtility {
 		ExecutedQuery(executionQuery.queryKey, queryResult, executionQuery.isTarget)
 	}
 
-	def getQueryMetadata(metadata: ResultSetMetaData, index: Int): QueryMetadataColumn = {
+	private def getQueryMetadata(metadata: ResultSetMetaData, index: Int): QueryMetadataColumn = {
 		QueryMetadataColumn(
 			metadata.getColumnDisplaySize(index),
 			metadata.getPrecision(index),
