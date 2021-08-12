@@ -6,6 +6,7 @@ import java.sql.Connection
 import java.util.Properties
 import com.zaxxer.hikari.{HikariConfig, HikariDataSource}
 import anorm.{BatchSql, NamedParameter, RowParser, SQL, ToParameterList}
+import com.typesafe.scalalogging.LazyLogging
 import configuration.Pinecone.connectionConf
 import exception.PineconeExceptionHandler.exceptionStop
 import reconciliation.QueryStage.{ExecutedQuery, ExecutionQuery}
@@ -13,14 +14,14 @@ import reconciliation.QueryStage.{ExecutedQuery, ExecutionQuery}
 import scala.util.{Failure, Success, Try}
 
 
-abstract class GeneralConnection(val config: Map[String, String]) extends PineconeExecutionUtility {
+abstract class GeneralConnection(val config: Map[String, String]) extends PineconeExecutionUtility with LazyLogging {
 	protected implicit val connection: Connection = getConnection
 
 	protected def getDriver: String
 
 	private def getConnection: Connection = {
 		initConnection match {
-			case Success(c) => c
+			case Success(c) => logger.info(s"Connection '${config("jdbcUrl")}' init successfully"); c
 			case Failure(exception) => exceptionStop(exception)
 		}
 	}
@@ -48,7 +49,9 @@ abstract class GeneralConnection(val config: Map[String, String]) extends Pineco
 		}
 	}
 
-	def executeInsert[R](tableName: String, macroParam: ToParameterList[R], data: List[R]): Try[Int] = {
+	def executeUpdate(query: String): Try[Unit] = Try { SQL(query).executeUpdate }
+
+	def executeInsert[R](tableName: String, macroParam: ToParameterList[R], data: List[R]): Try[Unit] = {
 		val dataParams = data.map(macroParam).zipWithIndex.map{
 			case(row, i) => row.map(r => NamedParameter(s"${SnakeCase(r.name)}_$i", r.value))
 		}
@@ -76,7 +79,7 @@ abstract class GeneralConnection(val config: Map[String, String]) extends Pineco
 		getQueryResult(getResultSet(query.query), query)
 	}
 
-	def closeConnection(): Unit = connection.close
+	def closeConnection(): Unit = connection.close; logger.info(s"Connection '${config("jdbcUrl")}' closed")
 }
 
 object GeneralConnection {
