@@ -23,4 +23,22 @@ object Pinecone {
 			case Right(conf) => conf
 		}
 	}
+
+	def stagesConf(): StagesConf = {
+		ConfigSource.resources("stages.conf").load[StagesConf] match {
+			case Right(conf) => conf
+		}
+	}
+
+	def singleStageWorkflowsConf(): SingleStageWorkflowsConf = {
+		ConfigSource.resources("single_workflows.conf").load[SingleStageWorkflowsConf] match {
+			case Right(conf) => conf
+		}
+	}
+
+	def multiStagesWorkflowsConf(): MultiStagesWorkflowsConf = {
+		ConfigSource.resources("multi_workflows.conf").load[MultiStagesWorkflowsConf] match {
+			case Right(conf) => conf
+		}
+	}
 }
