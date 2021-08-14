@@ -25,21 +25,12 @@ object Initialize extends LazyLogging{
 			  | STAGES TEXT NOT NULL,
 			  | RECONCILE_KEYS TEXT NOT NULL,
 			  | ACCEPTED_DEVIATION NUMBER(23,5) DEFAULT 0,
-			  | INSERT_TIMESTAMP TIMESTAMP_TZ DEFAULT CURRENT_TIMESTAMP(),
-			  | UPDATE_TIMESTAMP TIMESTAMP_TZ,
-			  | CONSTRAINT PK_PINECONE_MULTI_STAGES_WORKFLOW PRIMARY KEY (WORKFLOW_KEY)
-			  |)""".stripMargin
-
-		val singleStagesWorkflowTableSql = s"""
-			  |CREATE ${replaceSql} TABLE ${qualifiedSchemaName}_SINGLE_STAGE_WORKFLOW(
-			  | WORKFLOW_KEY VARCHAR(256),
-			  | STAGE VARCHAR(256) NOT NULL,
 			  | CAN_EMPTY BOOLEAN DEFAULT FALSE,
 			  | CAN_EMPTY_ON_CONSECUTIVE_TIMES BOOLEAN DEFAULT FALSE,
 			  | MAXIMUM_EMPTY_ON_CONSECUTIVE_TIMES NUMBER(10, 0),
 			  | INSERT_TIMESTAMP TIMESTAMP_TZ DEFAULT CURRENT_TIMESTAMP(),
 			  | UPDATE_TIMESTAMP TIMESTAMP_TZ,
-			  | CONSTRAINT PK_PINECONE_SINGLE_STAGE_WORKFLOW PRIMARY KEY (WORKFLOW_KEY)
+			  | CONSTRAINT PK_PINECONE_MULTI_STAGES_WORKFLOW PRIMARY KEY (WORKFLOW_KEY)
 			  |)""".stripMargin
 
 		val resultsTableSql =
@@ -66,7 +57,7 @@ object Initialize extends LazyLogging{
 			  | CONSTRAINT PK_PINECONE_RESULTS PRIMARY KEY (RESULT_ID)
 			  |)""".stripMargin
 
-		List(stagesTableSql, multiStagesWorkflowTableSql, singleStagesWorkflowTableSql, resultsTableSql).foreach(q => {
+		List(stagesTableSql, multiStagesWorkflowTableSql, resultsTableSql).foreach(q => {
 			sqlException(connection.executeUpdate(q), s"DDL ${q} execute successfully", logger)
 		})
 	}

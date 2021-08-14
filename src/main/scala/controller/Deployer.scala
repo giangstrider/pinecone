@@ -3,7 +3,7 @@ package controller
 import adapter.GeneralConnection
 import anorm.ToParameterList
 import com.typesafe.scalalogging.LazyLogging
-import configuration.{MultiStagesWorkflowConf, SingleStageWorkflowConf}
+import configuration.MultiStagesWorkflowConf
 import exception.PineconeExceptionHandler.sqlException
 
 
@@ -19,7 +19,6 @@ object Deployer extends LazyLogging{
 	private def compareByKey[SW](config: SW, remote: SW): Boolean = {
 		(config, remote) match {
 			case (a: Stage ,b: Stage) => a.stageKey == b.stageKey
-			case (a: SingleStageWorkflowConf ,b: SingleStageWorkflowConf) => a.workflowKey == b.workflowKey
 			case (a: MultiStagesWorkflowConf ,b: MultiStagesWorkflowConf) => a.workflowKey == b.workflowKey
 		}
 	}

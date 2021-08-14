@@ -3,7 +3,7 @@ package controller
 import adapter.GeneralConnection
 import anorm.RowParser
 import com.typesafe.scalalogging.LazyLogging
-import configuration.{MultiStagesWorkflowConf, SingleStageWorkflowConf}
+import configuration.MultiStagesWorkflowConf
 import exception.PineconeExceptionHandler.sqlException
 import reconciliation.QueryStage.PrepareQuery
 
@@ -11,15 +11,6 @@ import reconciliation.QueryStage.PrepareQuery
 object Loader extends LazyLogging {
 	def load[S](query: String, parser: RowParser[S])(implicit connection: GeneralConnection): List[S] = {
 		sqlException(connection.executeQuery(query, parser), s"Load ${query} successfully", logger)
-	}
-
-	def transformSingleStage(data: List[SingleStageWorkflowConf], stages: List[Stage]): List[SingleStageWorkflow] = {
-		data.map({ w =>
-			val stage = groupStageByKey(stages)(w.stage).head
-			SingleStageWorkflow(
-				w.workflowKey, stage, w.canEmpty, w.canEmptyOnConsecutiveTimes, w.maximumEmptyOnConsecutiveTimes
-			)
-		})
 	}
 
 	def transformMultiStages(data: List[MultiStagesWorkflowConf], stages: List[Stage]): List[PrepareQuery] = {
