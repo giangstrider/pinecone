@@ -12,7 +12,7 @@ import scala.io.Source
 
 object ApplicationController extends LazyLogging{
 	private val databaseConfig = pineconeConf.database
-	private implicit val connection: GeneralConnection = GeneralConnection.getJdbcConnection(databaseConfig.connectionName)
+	private implicit val connection: GeneralConnection = GeneralConnection.getSnowflakeConnection(databaseConfig.connectionName)
 	private val fullyQualifiedTablePrefix = s"${databaseConfig.databaseName}.${databaseConfig.schemaName}.PINECONE"
 
 	private val stagesTable = s"${fullyQualifiedTablePrefix}_STAGES"
@@ -27,7 +27,7 @@ object ApplicationController extends LazyLogging{
 
 	private def getStages = {
 		stagesConf().stages.map(s => {
-			Stage(s.stageKey, getTextFromSQLMethod(s.query), s.isOriginal)
+			Stage(s.stageKey, s.connectionName, getTextFromSQLMethod(s.query), s.isOriginal)
 		})
 	}
 
@@ -52,8 +52,12 @@ object ApplicationController extends LazyLogging{
 		if(insertListSW.nonEmpty) Deployer.insert(multiStagesWorkflowTable, insertListMW, Macro.toParameters[MultiStagesWorkflowConf])
 		if(updateListMW.nonEmpty) Deployer.update(multiStagesWorkflowTable, updateListMW, Macro.toParameters[MultiStagesWorkflowConf], Set("WORKFLOW_KEY"))
 	}
-	
 
+	def getQueries = {
+		val stages = Loader.load(selectQuery(stagesTable), stagesParser)
+		val multiStagesWorkflows = Loader.load(selectQuery(multiStagesWorkflowTable), multiStagesWorkflowParer)
+		Loader.transformMultiStages(multiStagesWorkflows, stages)
+	}
 
 	private def getTextFromSQLMethod(sqlMethod: SQLMethod): String = {
 		sqlMethod match {

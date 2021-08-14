@@ -11,6 +11,7 @@ object Initialize extends LazyLogging{
 			s"""
 			  |CREATE ${replaceSql} TABLE ${qualifiedSchemaName}_STAGES(
 			  | STAGE_KEY VARCHAR(256),
+			  | CONNECTION_NAME VARCHAR(256),
 			  | QUERY TEXT NOT NULL,
 			  | IS_ORIGINAL BOOLEAN DEFAULT FALSE,
 			  | INSERT_TIMESTAMP TIMESTAMP_TZ DEFAULT CURRENT_TIMESTAMP(),

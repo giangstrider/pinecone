@@ -5,6 +5,7 @@ import anorm.RowParser
 import com.typesafe.scalalogging.LazyLogging
 import configuration.{MultiStagesWorkflowConf, SingleStageWorkflowConf}
 import exception.PineconeExceptionHandler.sqlException
+import reconciliation.QueryStage.PrepareQuery
 
 
 object Loader extends LazyLogging {
@@ -21,14 +22,17 @@ object Loader extends LazyLogging {
 		})
 	}
 
-	def transformMultStages(data: List[MultiStagesWorkflowConf], stages: List[Stage]): List[MultiStagesWorkflow] = {
-		data.map({ w =>
+	def transformMultiStages(data: List[MultiStagesWorkflowConf], stages: List[Stage]): List[PrepareQuery] = {
+		data.flatMap { w =>
 			val keys = w.stages.split(",")
-			val stages = groupStageByKey(stages).filter(ws => keys.contains(ws._1)).values.flatten.toList
-			MultiStagesWorkflow(
-				w.workflowKey, stages, w.reconcileKeys.split(",").toList, w.acceptedDeviation
-			)
-		})
+			val filterStages = groupStageByKey(stages).filter(ws => keys.contains(ws._1)).values.flatten.toList
+			val fixedFirstStage = filterStages.filter(_.isOriginal).head // should use head-option instead
+			val targetedStages = filterStages.filterNot(_.isOriginal)
+			targetedStages.map({ t =>
+				val formedQueryKey = s"${w.workflowKey}_${fixedFirstStage.stageKey}_${t.stageKey}"
+				PrepareQuery(formedQueryKey, w.workflowKey, fixedFirstStage.connectionName, fixedFirstStage.query, t.connectionName, t.query, w.acceptedDeviation, w.reconcileKeys.split(",").toList)
+			})
+		}
 	}
 
 	private def groupStageByKey(stages: List[Stage]) = stages.groupBy(_.stageKey)
