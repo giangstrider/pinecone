@@ -3,6 +3,8 @@
 Pinecone is a Data Reconciliation application build on Scala to reconciling data between multiple databases with various reporting and monitoring capabilities. It comes up with a configurable approach and different deployment strategies fit for many data teams to operating reconciliation workloads efficiently.
 <br /><br />
 
+![pinecone](https://user-images.githubusercontent.com/12697164/129473185-ab2e775e-4a3f-4be2-a1c8-e0a00297dfe2.PNG)
+
 # Motivation
 
 Data mismatch has always been a headache problem for data engineer teams who maintain multiple data pineline workloads sourcing from several databases ranging from back-end application team to ETL pipeline from persistent stage to Data mart. Data stakeholders come to the team and say there is a data mismatch or at least their suspectation. The team needs to manually run SQL queries against data source, and then data destination. Sometimes, it is a historical data which has nothing wrong in the past but suddenly mismatch, or you just run a job, finish the pineline and want to make sure that data looks OK. These kinds of works happen all the time and eventually become a "new official" job description since the demand of moving data from one place to multiple places growing gradually.
