@@ -21,7 +21,8 @@ object Loader extends LazyLogging {
 			val targetedStages = filterStages.filterNot(_.isOriginal)
 			targetedStages.map({ t =>
 				val formedQueryKey = s"${w.workflowKey}_${fixedFirstStage.stageKey}_${t.stageKey}"
-				PrepareQuery(formedQueryKey, w.workflowKey, fixedFirstStage.connectionName, fixedFirstStage.query, t.connectionName, t.query, w.acceptedDeviation, w.reconcileKeys.split(",").toList)
+				PrepareQuery(formedQueryKey, w.workflowKey, fixedFirstStage.connectionName, fixedFirstStage.query, t.connectionName, t.query, w.acceptedDeviation,
+					w.canEmpty, w.canEmptyOnConsecutiveTimes, w.maximumEmptyOnConsecutiveTimes, w.reconcileKeys.split(",").toList)
 			})
 		}
 	}

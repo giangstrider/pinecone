@@ -3,6 +3,7 @@ package configuration
 
 case class StageConf(
     stageKey: String,
+    connectionName: String,
     query: SQLMethod,
     isOriginal: Boolean = false
 )
@@ -16,21 +17,11 @@ case class MultiStagesWorkflowConf(
 	workflowKey: String,
 	stages: String,
 	reconcileKeys: String,
-	acceptedDeviation: Double
+	acceptedDeviation: Double,
+    canEmpty: Boolean,
+    maximumEmptyOnConsecutiveTimes: Int
 )
 
 case class MultiStagesWorkflowsConf(
     workflows: List[MultiStagesWorkflowConf]
-)
-
-case class SingleStageWorkflowConf(
-    workflowKey: String,
-    stage: String,
-    canEmpty: Boolean,
-    canEmptyOnConsecutiveTimes: Boolean,
-    maximumEmptyOnConsecutiveTimes: Int
-)
-
-case class SingleStageWorkflowsConf(
-    workflows: List[SingleStageWorkflowConf]
 )
