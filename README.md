@@ -1,46 +1,44 @@
 # Pinecone
 
-Pinecone is a Data Reconciliation application build on Scala to reconciling data between multiple databases with various reporting and monitoring capabilities. It comes up with a configurable approach and different deployment strategies fit for many data teams to operating reconciliation workloads efficiently.
+Pinecone is a Data Reconciliation application to reconcile data between multiple databases with various reporting and monitoring capabilities. It comes up with a configurable approach and different deployment strategies suitable for any data teams to operate reconciliation workloads efficiently.
 <br /><br />
 
 ![pinecone](https://user-images.githubusercontent.com/12697164/129473185-ab2e775e-4a3f-4be2-a1c8-e0a00297dfe2.PNG)
 
 # Motivation
 
-Data mismatch has always been a headache problem for data engineer teams who maintain multiple data pineline workloads sourcing from several databases ranging from back-end application team to ETL pipeline from persistent stage to Data mart. Data stakeholders come to the team and say there is a data mismatch or at least their suspectation. The team needs to manually run SQL queries against data source, and then data destination. Sometimes, it is a historical data which has nothing wrong in the past but suddenly mismatch, or you just run a job, finish the pineline and want to make sure that data looks OK. These kinds of works happen all the time and eventually become a "new official" job description since the demand of moving data from one place to multiple places growing gradually.
+Data mismatch has always been a headache for data engineering teams who maintain multiple data pineline workloads sourced from several databases, ranging from back-end application to ETL pipeline, or from persistent stage to Data mart. On a frequent basis, data stakeholders (e.g. business users, product owner, etc.) place inquiries to the data engineering team about data mismatch problems. The team needs to manually run SQL queries against data source and data destination. In some cases, the data are historical, with no problem in the past but suddenly experience a recent mismatch. In other cases, the stakeholders have recently run a job, finished the pineline and want to make sure that the data look OK. These kinds of work happen all the time and eventually become a "new official" job description since the demand of moving data from one place to multiple places are growing gradually.
 
-Pinecone aims to solve the problem by basic idea that form up SQL queries run against source and target data. It provides a set of rules for users to set up their expectation on accepted deviation and how do you want to compare the results. It also provides `Pinecone variable` which is the variable template that you can use in your own SQL queries and it will be transformed to the value at run-time. Finally, set your own rules by defining how to monitor it and how to make changes with ease, integrating with modern orchestration workflow such as Airflow to operate in data engineering fashion.
+Pinecone aims to solve the problem by the basic ideas that form up SQL queries run against source and target data. It provides a set of rules to users to set up their expectation on accepted deviation and how they want to compare the results. It also provides `Pinecone variables` which is the variable template that users can use in their own SQL queries, and will be transformed to the value at run-time. Finally, users can set their own rules with ease, by defining how to monitor them and how to integrate them with modern orchestration workflow, such as Airflow.
 <br />
 <br />
 
 # Note - Work in progress
 
-This project developed internally. I'm rewriting it in a general approach to release as an open source project.
+This project is being developed internally.
+Checkout [LICENSE](https://github.com/giangstrider/pinecone/blob/master/LICENSE)
 
-Checkout [LISENCE](https://github.com/giangstrider/pinecone/blob/master/LICENSE)
-
-All contributions are more than welcome.
-Please reach out to me on email strider.giang@live.com or Github issues.
+All contributions are more than welcomed.
+Please reach out to me at my email: strider.giang@live.com or Github issues.
 
 <br />
 
 # Main Features
  
-- Define your own reconciliation workflow basically including data source and data target with many options for reporting, monitoring, and alert notification.
-- Connect to multiple database connections via JDBC to execute your SQL queries.
-- SQL templating: using Pinecone's define variable to dynamically replace itself value at run time (such as \${yesterday}, ${last_6_months} ...)
-- Numeric reconciliation and String like reconciliation.
-- Rolling back your entire's workflow definition to any specific point of time.
+- Define your own reconciliation workflow including data source and data target with many options for reporting, monitoring, and alert notification.
+- Connect to multiple databases via JDBC to execute your SQL queries.
+- SQL templating: using Pinecone's define variables to dynamically replace its value at run time (such as \${yesterday}, ${last_6_months} ...)
+- Rolling back your entire workflow definition to any specific point of time.
 
-**Note**: The intention going forward enable user to interact with Pinecone through the Dashboard, rather via CLI approach currently. If you want to contribute to building a Dashboard, let me know.
+**Note**: Pinecone is aiming at enabling user to interact through the Dashboard rather than via the current CLI approach. If you want to contribute to building a Dashboard, let me know.
  
  
 # Core Concepts
-The basic idea of Pinecone is the central place for executing a set of reconciliation queries against many data sources and compare them with your own definition and decide what to do with the compared result. This is called Reconciliation Workflow.
+The basic idea of Pinecone is the central place for executing a set of reconciliation queries against many data sources, comparing them with your own definition and deciding what to do with the compared results. This is called the Reconciliation Workflow.
  
-It also has capability to configure your queries run back at any point of time, compare and generate the report around it. But again, this is based on the concept of Reconciliation Workflow.
+It has the capability to configure your queries to travel back at any point of time, compare and generate the report around it.
  
-By utilizing JDBC, we can connect to almost any database available. Not only databases, it also means that we can also utilize the computing capacity of many query execution engines such as Trino or Spark.
+By utilising JDBC, we can connect to almost any database available. Not only database connection, we can also utilise the computing capacity of many query execution engines such as Trino or Spark.
  
 ## What's Pinecone compare? How does the comparison work?
  
