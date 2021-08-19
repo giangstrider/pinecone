@@ -20,14 +20,14 @@ object RecordReconciliation {
 				val matchedPair = groupRecords.filter(_._2.size == 2).values.map(pair => {
 					val columnsS = pair.head.columns
 					val columnsT = pair.last.columns
-					
+
 					val reconcileTypedColumns = columnsS.zipWithIndex.map{case (sc, index) =>
 						val tc = columnsT(index)
 						val value = convertToReconcileColumn(sc.columnValue, tc.columnValue)
 						val clazz = classReconcile(sc.columnValue.get, tc.columnValue.get)
 						val meta = Some(metadataReconcile(sc.metadata, tc.metadata, clazz))
 						val isReconcileKey = checkReconcileKey(sc.columnName)
-						ReconciledColumn(sc.columnName, isReconcileKey, value, meta)
+						ReconciledColumn(sc.columnName, tc.columnName, isReconcileKey, value, meta)
 					}
 
 					ReconciliationRecord(query.queryKey, reconcileTypedColumns)
@@ -54,7 +54,7 @@ object RecordReconciliation {
 					val pairAttributes = columns.map(c => {
 						val value = convertToReconcileColumn(c.columnValue, None)
 						val isReconcileKey = checkReconcileKey(c.columnName)
-						ReconciledColumn(c.columnName, isReconcileKey, value, None)
+						ReconciledColumn(c.columnName, "", isReconcileKey, value, None)
 					})
 					ReconciliationRecord(query.queryKey, pairAttributes)
 				})
@@ -64,7 +64,7 @@ object RecordReconciliation {
 					val pairAttributes = columns.map(c => {
 						val value = convertToReconcileColumn(None, c.columnValue)
 						val isReconcileKey = checkReconcileKey(c.columnName)
-						ReconciledColumn(c.columnName, isReconcileKey, value, None)
+						ReconciledColumn("", c.columnName, isReconcileKey, value, None)
 					})
 					ReconciliationRecord(query.queryKey, pairAttributes)
 				})
@@ -76,12 +76,12 @@ object RecordReconciliation {
 			val pairAttributes = if (isTarget) qc.columns.map(c => {
 				val value = convertToReconcileColumn(None, c.columnValue)
 				val isReconcileKey = query.reconcileKey.contains(c.columnName)
-				ReconciledColumn(c.columnName, isReconcileKey, value, None)
+				ReconciledColumn("", c.columnName, isReconcileKey, value, None)
 			})
 			else qc.columns.map(c => {
 				val value = convertToReconcileColumn(c.columnValue, None)
 				val isReconcileKey = query.reconcileKey.contains(c.columnName)
-				ReconciledColumn(c.columnName, isReconcileKey, value, None)
+				ReconciledColumn(c.columnName, "", isReconcileKey, value, None)
 			})
 			ReconciliationRecord(query.queryKey, pairAttributes)
 		})

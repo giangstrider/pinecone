@@ -21,7 +21,8 @@ case class QueryMetadataColumn (
 )
 
 case class ReconciledColumn (
-    columnName: String,
+    sourceColumnName: String,
+    targetColumnName: String,
     isReconcileKey: Boolean,
     value: ReconcileTypedColumn,
     metadata: Option[ReconcileMetadataColumn]

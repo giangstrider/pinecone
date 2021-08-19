@@ -27,7 +27,8 @@ case class Result(
      isReconcileKey: Boolean,
      sourceName: String,
      targetName: String,
-     metricName: String,
+     sourceMetricName: String,
+     targetMetricName: String,
      sourceMetricValue: String,
      targetMetricValue: String,
      variance: String,
@@ -98,7 +99,7 @@ object ApplicationController extends LazyLogging{
 
 						Result(
 							q.query.workflowKey, isViolate, c.isReconcileKey, q.query.sourceName, q.query.targetName,
-							c.columnName, sourceValue.getOrElse().toString, targetValue.getOrElse().toString, variance.toString, deviation, isViolate
+							c.sourceColumnName, c.targetColumnName, sourceValue.getOrElse().toString, targetValue.getOrElse().toString, variance.toString, deviation, isViolate
 						)
 					})
 
