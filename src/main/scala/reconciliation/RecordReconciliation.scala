@@ -20,33 +20,16 @@ object RecordReconciliation {
 				val matchedPair = groupRecords.filter(_._2.size == 2).values.map(pair => {
 					val columnsS = pair.head.columns
 					val columnsT = pair.last.columns
+					
+					val reconcileTypedColumns = columnsS.zipWithIndex.map{case (sc, index) =>
+						val tc = columnsT(index)
+						val value = convertToReconcileColumn(sc.columnValue, tc.columnValue)
+						val clazz = classReconcile(sc.columnValue.get, tc.columnValue.get)
+						val meta = Some(metadataReconcile(sc.metadata, tc.metadata, clazz))
+						val isReconcileKey = checkReconcileKey(sc.columnName)
+						ReconciledColumn(sc.columnName, isReconcileKey, value, meta)
+					}
 
-					val attributeS = sort(columnsS)
-					val attributesT = sort(columnsT)
-
-					val pairAttributes = attributeS.map(sc => {
-						attributesT.find(c => sc.columnName == c.columnName) match {
-							case Some(tc) =>
-								val value = convertToReconcileColumn(sc.columnValue, tc.columnValue)
-								val clazz = classReconcile(sc.columnValue.get, tc.columnValue.get)
-								val meta = Some(metadataReconcile(sc.metadata, tc.metadata, clazz))
-								val isReconcileKey = checkReconcileKey(sc.columnName)
-								ReconciledColumn(sc.columnName, isReconcileKey, value, meta)
-							case None =>
-								val value = convertToReconcileColumn(sc.columnValue, None)
-								val isReconcileKey = checkReconcileKey(sc.columnName)
-								ReconciledColumn(sc.columnName, isReconcileKey, value, None)
-						}
-					})
-
-					val missTargetAttributes = attributesT.filterNot(tm => attributeS.map(_.columnName)
-						.contains(tm.columnName)).map(tm => {
-						val value = convertToReconcileColumn(None, tm.columnValue)
-						val isReconcileKey = checkReconcileKey(tm.columnName)
-						ReconciledColumn(tm.columnName, isReconcileKey, value, None)
-					})
-
-					val reconcileTypedColumns = pairAttributes ++ missTargetAttributes
 					ReconciliationRecord(query.queryKey, reconcileTypedColumns)
 				}).toList
 
