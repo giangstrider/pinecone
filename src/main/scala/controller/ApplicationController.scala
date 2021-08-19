@@ -9,6 +9,9 @@ import configuration.{FileBase, MultiStagesWorkflowConf, SQLMethod, TextBase}
 import reconciliation.QueryStage.{PrepareQuery, ReconciliationQuery}
 import reconciliation.ReconcileTypedColumn.{NumberColumn, StringLikeColumn}
 
+import java.util.concurrent.Executors
+import scala.concurrent.{ExecutionContext, Future}
+import scala.util.{Failure, Success, Try}
 import scala.io.Source
 
 case class Stage(
@@ -20,6 +23,7 @@ case class Stage(
 
 case class Result(
      workflowKey: String,
+     retryNextRun: Boolean,
      isReconcileKey: Boolean,
      sourceName: String,
      targetName: String,
@@ -33,6 +37,8 @@ case class Result(
 
 
 object ApplicationController extends LazyLogging{
+	private val executors = Executors.newFixedThreadPool(pineconeConf.concurrency.fixedPoolSize)
+    private implicit val executionContext = ExecutionContext.fromExecutorService(executors)
 	private val databaseConfig = pineconeConf.database
 	private implicit val connection: GeneralConnection = GeneralConnection.getSnowflakeConnection(databaseConfig.connectionName)
 	private val fullyQualifiedTablePrefix = s"${databaseConfig.databaseName}.${databaseConfig.schemaName}.PINECONE"
@@ -78,25 +84,31 @@ object ApplicationController extends LazyLogging{
 		Loader.load(selectQuery(multiStagesWorkflowTable), multiStagesWorkflowParser)
 	}
 
-	def insertResults(results: List[ReconciliationQuery]): Unit = {
-		val transformedData = results.flatMap(q => {
+	def insertResults(results: Future[List[ReconciliationQuery]]): Unit = {
+		results.transform {
+			case Success(resultsSuccess) => val transformedData = resultsSuccess.flatMap(q => {
 			q.records match {
 				case Some(records) =>
 					records.flatMap(r => { r.reconciled.map(c => {
+
 						val (sourceValue, targetValue, variance, deviation, isViolate) = c.value match {
-							case NumberColumn(source, target, different, deviationInside, isMetAcceptedDeviation, isMatched) => (source, target, different, deviationInside, isMatched)
-							case StringLikeColumn(source, target, isMatched) => (source, target, "NOT_APPLY", if(isMatched)  0 else 100, isMatched)
+							case NumberColumn(source, target, different, deviationInside, isMetAcceptedDeviation, isMatched) => (source, target, different, deviationInside, !isMatched)
+							case StringLikeColumn(source, target, isMatched) => (source, target, "NOT_APPLY", if(isMatched)  0.0 else 100.0, !isMatched)
 						}
+
 						Result(
-							q.query.workflowKey, c.isReconcileKey, q.query.sourceName, q.query.targetName,
-							c.columnName, sourceValue.toString, targetValue.toString, variance.toString, deviation, isViolate
+							q.query.workflowKey, isViolate, c.isReconcileKey, q.query.sourceName, q.query.targetName,
+							c.columnName, sourceValue.getOrElse().toString, targetValue.getOrElse().toString, variance.toString, deviation, isViolate
 						)
 					})
 
 					})
 			}
 		})
-		Deployer.insert(resultsTable, transformedData, Macro.toParameters[Result])
+		Try(Deployer.insert(resultsTable, transformedData, Macro.toParameters[Result]))
+			case Failure(exception) => Try(println(exception.getMessage))
+		}
+
 	}
 
 	private def getTextFromSQLMethod(sqlMethod: SQLMethod): String = {

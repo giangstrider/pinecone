@@ -3,7 +3,6 @@ package reconciliation
 import configuration.Pinecone.pineconeConf
 import reconciliation.QueryStage.{PrepareQuery, ReconciliationRecord}
 import reconciliation.ReconcileTypedColumn.{NumberColumn, StringLikeColumn}
-import exception.PineconeExceptionHandler.exceptionStop
 
 import java.util.Date
 import java.sql.Timestamp
@@ -11,7 +10,7 @@ import java.sql.Timestamp
 
 object RecordReconciliation {
 	def reconcile(source: Option[List[QueryRecord]], target: Option[List[QueryRecord]], query: PrepareQuery): List[ReconciliationRecord] = {
-		val checkReconcileKey = (v: String) => query.reconcileKey.contains(v)
+		val checkReconcileKey = (v: String) => query.reconcileKey.map(_.toUpperCase).contains(v.toUpperCase)
 		val sort = (v: List[QueryColumn]) => v.sortBy(_.columnName)
 		implicit val acceptedDeviation: Double = query.acceptedDeviation
 
