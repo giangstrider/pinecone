@@ -5,16 +5,15 @@ import PineconeSQLUtil._
 
 class PineconeSQLParser extends RegexParsers {
 	def number: Parser[Long] = """-?(0|[1-9]\d*)""".r ^^ { _.toLong }
-	def fixedDateParameter: Parser[String] = "([12]\\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\\d|3[01]))".r
+	def fixedDateParameter: Parser[String] = "('[12]\\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\\d|3[01])')".r
 
 	def conditionOpen: Parser[String] = "${"
-	def conditionGroupOpen: Parser[String] = "$WHERE{"
-	def generalOpen: Parser[String] = conditionOpen | conditionGroupOpen
+	def timeRolloutIndicatorOpen: Parser[String] = "$TIME{"
+	def generalOpen: Parser[String] = conditionOpen | timeRolloutIndicatorOpen
 	def conditionClose: Parser[String] = "}"
 
-	def singleOperator: Parser[String] = "=" | "!=" | ">" | "<" | ">=" | "<="
 	def betweenOperator: Parser[String] = "BETWEEN"
-	def operatorOpen: Parser[String] = singleOperator | betweenOperator
+	def inOperator: Parser[String] = "IN"
 
 	def dateFunction: Parser[String] = "GET_DATE" | "GET_TIMESTAMP"
 	def dateOffsetParameter = dateFunction ~ "(" ~ number ~ ")" ^^ {
@@ -34,13 +33,19 @@ class PineconeSQLParser extends RegexParsers {
 	}
 
 	def singleStatement = dateParam | extractDateParam ^^ (param => param)
-	def betweenStatement = betweenOperator ~ "(" ~ dateParam ~ "," ~ dateParam ~ ")" ^^ {
+	def betweenStatement = betweenOperator ~ "(" ~ singleStatement ~ "," ~ singleStatement ~ ")" ^^ {
 		case operator ~ openBracket ~ startParam ~ comma ~ endParam ~ closeBracket =>
 			s"BETWEEN $startParam AND $endParam"
 	}
 
+	def optInParam = singleStatement ~ opt(",")
+	def inStatement = inOperator ~ "(" ~ optInParam.* ~ ")" ^^ {
+		case operator ~ openBracket ~ dateInside ~ closeBracket => s"IN (${dateInside.map(_._1).mkString(", ")})"
+	}
+
+
 	def finalStatement = (
-			(generalOpen ~ singleStatement) | (conditionGroupOpen ~ betweenStatement)
+			generalOpen ~ (singleStatement | betweenStatement | inStatement)
 		) ~ conditionClose ^^ {
 		case open ~ statement ~ close => statement
 	}
