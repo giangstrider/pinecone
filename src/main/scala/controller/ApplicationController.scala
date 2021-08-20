@@ -6,7 +6,6 @@ import anorm.Macro.ColumnNaming.SnakeCase
 import com.typesafe.scalalogging.LazyLogging
 import configuration.Pinecone.{multiStagesWorkflowsConf, pineconeConf, stagesConf}
 import configuration.{FileBase, MultiStagesWorkflowConf, SQLMethod, TextBase}
-import parser.PineconeSQLProcessor
 import reconciliation.QueryStage.{PrepareQuery, ReconciliationQuery}
 import reconciliation.ReconcileTypedColumn.{NumberColumn, StringLikeColumn}
 

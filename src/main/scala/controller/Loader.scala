@@ -18,12 +18,14 @@ object Loader extends LazyLogging {
 		data.flatMap { w =>
 			val keys = w.stages.split(",")
 			val filterStages = stages.filter(ws => keys.contains(ws._1)).values.flatten.toList
-			val fixedFirstStage = filterStages.filter(_.isOriginal).head // should use head-option instead
+			val fixedFirstStage = filterStages.filter(_.isOriginal).head
 			val targetedStages = filterStages.filterNot(_.isOriginal)
 			targetedStages.map({ t =>
 				val formedQueryKey = s"${w.workflowKey}_${fixedFirstStage.stageKey}_${t.stageKey}"
-				PrepareQuery(formedQueryKey, w.workflowKey, fixedFirstStage.connectionName, PineconeSQLProcessor(fixedFirstStage.query), t.connectionName, PineconeSQLProcessor(t.query), w.acceptedDeviation,
-				w.reconcileKeys.split(",").toList)
+				PrepareQuery(formedQueryKey, w.workflowKey,
+					fixedFirstStage.connectionName, PineconeSQLProcessor(fixedFirstStage.query, None),
+					t.connectionName, PineconeSQLProcessor(t.query, None),
+					w.acceptedDeviation, w.reconcileKeys.split(",").toList)
 			})
 		}
 	}
