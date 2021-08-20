@@ -13,18 +13,18 @@ object PineconeSQLUtil {
 	def getDateObject(days: Long = 0): String = {
 		val localDate = LocalDate.now(timezone).minusDays(days * -1)
 		val formatter = DateTimeFormatter.ofPattern(dateFormat)
-		localDate.format(formatter)
+		s"'${localDate.format(formatter)}'"
 	}
 
 	def getTimestampObject(seconds: Long = 0): String = {
 		val localDateTime = LocalDateTime.now(timezone).minusSeconds(seconds * -1)
 		val formatter = DateTimeFormatter.ofPattern(dateTimeFormat)
-		localDateTime.format(formatter)
+		s"'${localDateTime.format(formatter)}'"
 	}
 
 	def getExtractedTimeFromDate(func: String, date: String): String = {
 		val pattern = DateTimeFormatter.ofPattern("yyyy-MM-dd")
-		val localDate = LocalDate.parse(date, pattern)
+		val localDate = LocalDate.parse(date.replace("'", ""), pattern)
 		val result = func match {
 			case "YEAR" => localDate.getYear
 			case "MONTH" => localDate.getMonthValue
