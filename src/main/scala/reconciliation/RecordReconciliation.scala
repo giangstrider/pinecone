@@ -10,10 +10,7 @@ import java.sql.Timestamp
 
 object RecordReconciliation {
 	def reconcile(source: Option[List[QueryRecord]], target: Option[List[QueryRecord]], query: PrepareQuery): List[ReconciliationRecord] = {
-		val checkReconcileKey = (v: String) => query.reconcileKey.map(_.toUpperCase).contains(v.toUpperCase)
-		val sort = (v: List[QueryColumn]) => v.sortBy(_.columnName)
 		implicit val acceptedDeviation: Double = query.acceptedDeviation
-
 		(source, target) match {
 			case (Some(s), Some(t)) =>
 				val groupRecords = (s ++ t).groupBy(_.reconcileKeyValue)
@@ -26,7 +23,7 @@ object RecordReconciliation {
 						val value = convertToReconcileColumn(sc.columnValue, tc.columnValue)
 						val clazz = classReconcile(sc.columnValue.get, tc.columnValue.get)
 						val meta = Some(metadataReconcile(sc.metadata, tc.metadata, clazz))
-						val isReconcileKey = checkReconcileKey(sc.columnName)
+						val isReconcileKey = checkReconcileKey(query, Seq(sc.columnName, tc.columnName))
 						ReconciledColumn(sc.columnName, tc.columnName, isReconcileKey, value, meta)
 					}
 
@@ -50,20 +47,18 @@ object RecordReconciliation {
 				matchedPair
 
 			case (Some(v), None) =>	v.map(qc => {
-					val columns = sort(qc.columns)
-					val pairAttributes = columns.map(c => {
+					val pairAttributes = qc.columns.map(c => {
 						val value = convertToReconcileColumn(c.columnValue, None)
-						val isReconcileKey = checkReconcileKey(c.columnName)
+						val isReconcileKey = checkReconcileKey(query, Seq(c.columnName))
 						ReconciledColumn(c.columnName, "", isReconcileKey, value, None)
 					})
 					ReconciliationRecord(query.queryKey, pairAttributes)
 				})
 
 			case (None, Some(v)) =>	v.map(qc => {
-					val columns = sort(qc.columns)
-					val pairAttributes = columns.map(c => {
+					val pairAttributes = qc.columns.map(c => {
 						val value = convertToReconcileColumn(None, c.columnValue)
-						val isReconcileKey = checkReconcileKey(c.columnName)
+						val isReconcileKey = checkReconcileKey(query, Seq(c.columnName))
 						ReconciledColumn("", c.columnName, isReconcileKey, value, None)
 					})
 					ReconciliationRecord(query.queryKey, pairAttributes)
@@ -181,6 +176,11 @@ object RecordReconciliation {
 			sourceCompareTarget
 		else targetCompareSource
 		ReconciledMetadataRecord(source.getClass, target.getClass, convertible)
+	}
+
+	private def checkReconcileKey(query: PrepareQuery, columnNames: Seq[String]): Boolean = {
+		val listKeys = query.reconcileKey.map(_.toUpperCase)
+		columnNames.exists(listKeys.contains)
 	}
 
 	private def setScale(number: Double): Double = {

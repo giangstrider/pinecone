@@ -6,6 +6,7 @@ import anorm.Macro.ColumnNaming.SnakeCase
 import com.typesafe.scalalogging.LazyLogging
 import configuration.Pinecone.{multiStagesWorkflowsConf, pineconeConf, stagesConf}
 import configuration.{FileBase, MultiStagesWorkflowConf, SQLMethod, TextBase}
+import parser.PineconeSQLProcessor
 import reconciliation.QueryStage.{PrepareQuery, ReconciliationQuery}
 import reconciliation.ReconcileTypedColumn.{NumberColumn, StringLikeColumn}
 
@@ -33,7 +34,9 @@ case class Result(
      targetMetricValue: String,
      variance: String,
      deviation: Double,
-     isViolateConfig: Boolean
+     isViolateConfig: Boolean,
+     sourceQuery: String,
+     targetQuery: String
 )
 
 
@@ -77,12 +80,29 @@ object ApplicationController extends LazyLogging{
 	}
 
 	def getQueries(workflows: List[MultiStagesWorkflowConf]): List[PrepareQuery] = {
-		val stages = Loader.load(selectQuery(stagesTable), stagesParser)
-		Loader.transformMultiStages(workflows, stages)
+		val stages = Loader.load(selectQuery(stagesTable), stagesParser).groupBy(_.stageKey)
+		val queries = Loader.transformMultiStages(workflows, stages)
+
+		val results = loadRetryResults
+		val groupedWorkflows = workflows.groupBy(_.workflowKey)
+		val retryQueries = if(results.nonEmpty) {
+			val retryWorkflows = results.map(r => groupedWorkflows(r.workflowKey).head)
+			val rawRetryQueries = Loader.transformMultiStages(retryWorkflows, stages)
+			val groupedResults = results.groupBy(_.workflowKey)
+			rawRetryQueries.map(rq => {
+				val result = groupedResults(rq.workflowKey).head
+				rq.copy(sourceQuery = result.sourceQuery, targetQuery = result.targetQuery)
+			})
+		} else None
+
+		queries ++ retryQueries
 	}
 
-	def getWorkflows: List[MultiStagesWorkflowConf] = {
-		Loader.load(selectQuery(multiStagesWorkflowTable), multiStagesWorkflowParser)
+	def getWorkflows: List[MultiStagesWorkflowConf] = Loader.load(selectQuery(multiStagesWorkflowTable), multiStagesWorkflowParser)
+
+	def loadRetryResults: List[Result] = {
+		val query = s"${selectQuery(resultsTable)} WHERE RETRY_NEXT_RUN = TRUE AND IS_RECONCILE_KEY = TRUE"
+		Loader.load(query, resultsParser)
 	}
 
 	def insertResults(results: Future[List[ReconciliationQuery]]): Unit = {
@@ -91,18 +111,16 @@ object ApplicationController extends LazyLogging{
 			q.records match {
 				case Some(records) =>
 					records.flatMap(r => { r.reconciled.map(c => {
-
 						val (sourceValue, targetValue, variance, deviation, isViolate) = c.value match {
 							case NumberColumn(source, target, different, deviationInside, isMetAcceptedDeviation, isMatched) => (source, target, different, deviationInside, !isMatched)
 							case StringLikeColumn(source, target, isMatched) => (source, target, "NOT_APPLY", if(isMatched)  0.0 else 100.0, !isMatched)
 						}
-
 						Result(
 							q.query.workflowKey, isViolate, c.isReconcileKey, q.query.sourceName, q.query.targetName,
-							c.sourceColumnName, c.targetColumnName, sourceValue.getOrElse().toString, targetValue.getOrElse().toString, variance.toString, deviation, isViolate
+							c.sourceColumnName, c.targetColumnName, sourceValue.getOrElse().toString, targetValue.getOrElse().toString, variance.toString, deviation, isViolate,
+							q.query.sourceQuery, q.query.targetQuery
 						)
 					})
-
 					})
 			}
 		})

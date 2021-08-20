@@ -5,7 +5,7 @@ case class StageConf(
     stageKey: String,
     connectionName: String,
     query: SQLMethod,
-    isOriginal: Boolean = false
+    isOriginal: Boolean
 )
 
 case class StagesConf(
