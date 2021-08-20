@@ -11,13 +11,13 @@ object PineconeSQLUtil {
 	private val dateTimeFormat = pineconeConf.sqlTemplate.timestampFormat
 
 	def getDateObject(days: Long = 0): String = {
-		val localDate = LocalDate.now(timezone).minusDays(days)
+		val localDate = LocalDate.now(timezone).minusDays(days * -1)
 		val formatter = DateTimeFormatter.ofPattern(dateFormat)
 		localDate.format(formatter)
 	}
 
 	def getTimestampObject(seconds: Long = 0): String = {
-		val localDateTime = LocalDateTime.now(timezone).minusSeconds(seconds)
+		val localDateTime = LocalDateTime.now(timezone).minusSeconds(seconds * -1)
 		val formatter = DateTimeFormatter.ofPattern(dateTimeFormat)
 		localDateTime.format(formatter)
 	}

@@ -5,6 +5,7 @@ import anorm.RowParser
 import com.typesafe.scalalogging.LazyLogging
 import configuration.MultiStagesWorkflowConf
 import exception.PineconeExceptionHandler.sqlException
+import parser.PineconeSQLProcessor
 import reconciliation.QueryStage.PrepareQuery
 
 
@@ -21,7 +22,7 @@ object Loader extends LazyLogging {
 			val targetedStages = filterStages.filterNot(_.isOriginal)
 			targetedStages.map({ t =>
 				val formedQueryKey = s"${w.workflowKey}_${fixedFirstStage.stageKey}_${t.stageKey}"
-				PrepareQuery(formedQueryKey, w.workflowKey, fixedFirstStage.connectionName, fixedFirstStage.query, t.connectionName, t.query, w.acceptedDeviation,
+				PrepareQuery(formedQueryKey, w.workflowKey, fixedFirstStage.connectionName, PineconeSQLProcessor(fixedFirstStage.query), t.connectionName, PineconeSQLProcessor(t.query), w.acceptedDeviation,
 				w.reconcileKeys.split(",").toList)
 			})
 		}

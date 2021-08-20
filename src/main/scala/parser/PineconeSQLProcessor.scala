@@ -9,10 +9,10 @@ object PineconeSQLProcessor extends PineconeSQLParser {
 		}
 	}
 
-	private def parseQuery(query: String): String = {
-		parse(finalStatement, query.toUpperCase) match {
+	private def parseQuery(pattern: String): String = {
+		parse(finalStatement, pattern.toUpperCase) match {
 			case Success(matched, _) => matched
-			case Failure(message, _) => throw new Exception(s"Parsing FAILURE: ${message} - Query: ${query.toUpperCase}")
+			case Failure(message, _) => throw new Exception(s"Parsing FAILURE: ${message} - Pattern: ${pattern.toUpperCase}")
 			case Error(message, _) => throw new Exception(s"Parsing ERROR: ${message}")
 		}
 	}
