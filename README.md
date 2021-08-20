@@ -128,7 +128,7 @@ As you may think, you can just use the database's function to do that. This is c
 - Application's configuration
 2. [SQL query construction](#example2)
 - Basic requirement
-- SQL Templating
+- [SQL Templating (SQL PARSER)](https://github.com/giangstrider/pinecone/blob/master/docs/PineconeSQLParser.md)
 3. [Deployment](#third-example)
 - Basic requirement
 - Deploy
