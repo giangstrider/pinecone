@@ -1,12 +1,14 @@
 package reconciliation
 
-import adapter.{GeneralConnection, ReconController}
+import adapter.GeneralConnection
+import com.typesafe.scalalogging.Logger
 import configuration.Pinecone.pineconeConf
 import reconciliation.QueryStage.{ExecutedQuery, ExecutionQuery, PrepareQuery, ReconciliationQuery}
 
 import java.util.concurrent.Executors
 import scala.concurrent._
 import exception.PineconeExceptionHandler.exceptionStop
+
 import scala.util.{Failure, Success, Try}
 
 
@@ -16,12 +18,9 @@ object Executor {
     private implicit val executionContext = ExecutionContext.fromExecutorService(executors)
 
 
-    def execute = {
-        val prepareQueries = ReconController.getQueries
-
-        implicit val executionQueries = Planner.pickPrepareStrategy("connection", prepareQueries)
+    def execute(prepareQueries: List[PrepareQuery]): Future[List[ReconciliationQuery]] = {
+        implicit val executionQueries = Planner.pickPrepareStrategy("pair", prepareQueries)
         val groupPrepareQueriesByKey = prepareQueries.groupBy(_.queryKey)
-        connectionGroupExecution(groupPrepareQueriesByKey)
 
         pickStrategy match {
 			case "pair" => pairExecution(groupPrepareQueriesByKey)
@@ -41,7 +40,7 @@ object Executor {
             } else {
 
                 val connection = GeneralConnection.getJdbcConnection(firstQuery.connectionName)
-                query.map(q => Future { blocking{connection.executePineconeQuery(q)}})
+                query.map(q => Future { blocking{ connection.executePineconeQuery(q)}})
             }
         }
 
@@ -52,9 +51,14 @@ object Executor {
                         val (sourceQuery, targetQuery) = classifySource(v.head, v.last)
                         val prepareQuery = groupedQueries(k)
                         QueryReconciliation.reconcile(sourceQuery, targetQuery, prepareQuery.head)
+                    case _ => ???
                 }.toList
+                executors.shutdown()
+                Logger("Executor").info("Complete")
+                Logger("Executor").info(reconciled.toString())
+
                 Try(reconciled)
-            case Failure(exception) => exceptionStop(exception)
+            case Failure(exception) => println(exception.getMessage); exceptionStop(exception)
         }
     }
 
@@ -72,6 +76,9 @@ object Executor {
                 val lastConnection = GeneralConnection.getJdbcConnection(lastQuery.connectionName)
                 (Future { blocking {firstConnection.executePineconeQuery(firstQuery)}}, Future { blocking {lastConnection.executePineconeQuery(lastQuery)}})
             }
+//            val firstConnection = GeneralConnection.getJdbcConnection(firstQuery.connectionName)
+//             val lastConnection = GeneralConnection.getJdbcConnection(lastQuery.connectionName)
+//            val (firstFuture, secondFuture) = (Future { blocking {firstConnection.executePineconeQuery(firstQuery)}}, Future { blocking {lastConnection.executePineconeQuery(lastQuery)}})
 
             firstFuture.zipWith(secondFuture)((f, l) => {
                 val prepareQuery = groupedQueries(f.queryKey)
@@ -81,9 +88,12 @@ object Executor {
         }
 
         Future.sequence(futures).transform {
-            case Success(vl) =>
-                Try(vl)
-            case Failure(exception) => exceptionStop(exception)
+            case Success(reconciled) =>
+//                executors.shutdown()
+                Logger("Executor").info("Complete")
+                Logger("Executor").info(reconciled.toString())
+                Try(reconciled)
+            case Failure(exception) => println("thala vl"); println(exception.printStackTrace()); exceptionStop(exception)
         }
     }
 

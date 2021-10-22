@@ -1,0 +1,5 @@
+package adapter
+
+class AWSAuthentication {
+
+}

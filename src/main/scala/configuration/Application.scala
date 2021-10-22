@@ -6,7 +6,9 @@ case class PineconeConf(
     proxy: PineconeProxyConf,
     databaseSupportedDriver: Map[String, String],
     sqlTemplate: PineconeSQLTemplateConf,
-    reconciliation: PineconeReconciliationConf
+    reconciliation: PineconeReconciliationConf,
+    concurrency: PineconeConcurrencyConf,
+    notification: PineconeNotificationConf
 )
 
 case class PineconeDatabaseConf(
@@ -31,6 +33,22 @@ case class PineconeSQLTemplateConf(
 )
 
 case class PineconeReconciliationConf(
-    strategy: String,
+    pickStrategy: String,
     decimalScale: Int
+)
+
+case class PineconeConcurrencyConf(
+	fixedPoolSize: Int
+)
+
+case class PineconeNotificationConf (
+	alertSns: Boolean,
+	alertEmail: Boolean,
+	reportEmail: Boolean,
+	subcriberGroups: Option[Map[String, Map[String, String]]],
+	emailConf: Option[PineconeEmailConf]
+)
+
+case class PineconeEmailConf (
+    smtpServer: String
 )

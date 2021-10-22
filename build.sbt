@@ -16,8 +16,13 @@ lazy val root = project
             "com.microsoft.sqlserver" % "mssql-jdbc" % "7.0.0.jre8",
             "com.amazon.redshift" % "redshift-jdbc42" % "2.0.0.4",
             "com.ibm.db2.jcc" % "db2jcc" % "db2jcc4",
-             "org.scalactic" %% "scalactic" % "3.2.9",
+            "com.amazon.redshift" % "redshift-jdbc42" % "1.2.1.1001",
+            "io.trino" % "trino-jdbc" % "359" % Test,
+            "org.scalactic" %% "scalactic" % "3.2.9",
             "org.scalatest" %% "scalatest" % "3.2.9" % "test",
-            "org.scalatest" %% "scalatest-flatspec" % "3.2.9" % "test"
+            "org.scalatest" %% "scalatest-flatspec" % "3.2.9" % "test",
+            "ch.qos.logback" % "logback-classic" % "1.2.3",
+            "com.typesafe.scala-logging" %% "scala-logging" % "3.9.2",
+            "org.apache.commons" % "commons-email" % "1.5"
         )
     )

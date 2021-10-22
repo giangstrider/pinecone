@@ -1,5 +1,6 @@
 package adapter
 
+import com.typesafe.scalalogging.Logger
 import configuration.Pinecone.pineconeConf
 import net.snowflake.client.core.QueryStatus
 import net.snowflake.client.jdbc.{SnowflakeResultSet, SnowflakeStatement, SnowflakeConnection => CoreSnowflakeConnection}
@@ -25,6 +26,7 @@ class SnowflakeConnection(override val config: Map[String, String]) extends Gene
 	def submit(queries: List[ExecutionQuery]): List[SnowflakeAsyncQuery] = {
 		val statement = this.connection.createStatement
 		for {executionQuery <- queries} yield {
+			println(executionQuery.query)
 			val queryId = statement.unwrap(classOf[SnowflakeStatement]).executeAsyncQuery(executionQuery.query)
 				.unwrap(classOf[SnowflakeResultSet]).getQueryID
 			SnowflakeAsyncQuery(queryId, QueryStatus.RUNNING, executionQuery)
@@ -40,11 +42,11 @@ class SnowflakeConnection(override val config: Map[String, String]) extends Gene
 			} else queryStatus
 		}
 
-			val resultSet = this.connection.unwrap(classOf[CoreSnowflakeConnection]).createResultSet(asyncQuery.snowflakeQueryId)
+		val resultSet = this.connection.unwrap(classOf[CoreSnowflakeConnection]).createResultSet(asyncQuery.snowflakeQueryId)
 		val queryStatus = queryStatusRecursive(resultSet)
 
-			queryStatus match {
-				case QueryStatus.SUCCESS => getQueryResult(resultSet, asyncQuery.executionQuery)
+		queryStatus match {
+			case QueryStatus.SUCCESS => getQueryResult(resultSet, asyncQuery.executionQuery)
 			case QueryStatus.FAILED_WITH_ERROR => exceptionStop(queryStatus.getErrorMessage)
 			case _ => exceptionStop(queryStatus.getDescription)
 		}

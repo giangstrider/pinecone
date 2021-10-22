@@ -26,4 +26,18 @@ object Planner {
 			case _ => exceptionStop("No valid strategy found")
 		}
 	}
+
+//	def test = {
+////		var h = Map[Int, Int]()
+////		Array(3,3).zipWithIndex.map(e => {
+////			val subtracted = 6 - e._2
+////			if(!h.contains(subtracted)) h + (subtracted, e._1) else Array(h(subtracted), e._1)
+////		})
+//		val h2 = Map[Int, Int]()
+//		val target = 6
+//		val x:String = Array(3,3).zipWithIndex.foldLeft(h2)((h, e) => {
+//			val subtract = target - e._2
+//			val hm = if(!h.contains(subtract)) h + (subtract, e._1) else h
+//		})
+//	}
 }
